@@ -181,7 +181,6 @@ IEncryptionManager通过调用IEncryptionKeyManager接口的getKey()方法获得
 
 以上无论那总方式都需要客户端具有定制http header的能力，将用base64加密的加密串替换成token。具体的内容参考 http 1.1 规范
 
-
 # CAS集成
 
 SECURITY 支持 CAS 认证，应用如果需要启用该功能，需要继续引用integration-cas 。具体配置参见 integration-cas 相关技术文档。
