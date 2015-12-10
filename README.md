@@ -89,9 +89,66 @@ authority是授权的名称，通常是String类型，或至少可以被字符�
 		void configure(HttpSecurity http) throws Exception;
 	}
 
-通过IHttpSecurityConfigure.configure方法，应用可以完全重新定义访问规则，语法规则参考Spring security相关文档。账户的验证和授权一旦通过，SECURITY会新建一个UserProperties实例，应用可以在任何地方通过以下方式获得当前登录账户的权限信息：
+通过IHttpSecurityConfigure.configure方法，应用可以完全重新定义访问规则，语法规则参考Spring security相关文档。应用通过一下方式获得登录用户信息 ：
 
-	@Autowired protected UserProperties userPreferences;
+## 在类中获的用户
+
+1) 用户
+
+	UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+	HtcheUserDetails userDetails = (HtcheUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+	CasUserDetails userDetails = (CasUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+2) 角色
+
+	Collection<GrantedAuthority> authorities = userDetails.getAuthorities();
+
+3) 角色对应权限
+
+	List<K> permissions=((HtcheGrantedAuthority) authorities.get(0)).getPermissions();
+
+## jsp中获取
+
+spring-security 在jsp中的标签库
+
+1.在jsp中声明
+
+	<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>  
+
+2.标签
+
+目前共有三个标签
+
+	<sec:authorize></sec:authorize>        
+	<sec:authentication property=""></sec:authentication>  
+	<sec:accesscontrollist hasPermission="" domainObject=""></sec:accesscontrollist>
+
+2.1、authorize标签
+
+这个标签用来决定它的内容是否会被执行.
+
+	<sec:authorize access="hasRole('supervisor')">This content will only be visible to users who have the "supervisor" authority in their list of GrantedAuthoritys.</sec:authorize>  
+
+显示一个特定的链接，如果用户允许点击它.
+
+	<sec:authorize url="/admin">This content will only be visible to users who are authorized to send requests to the "/admin" URL.</sec:authorize>  
+
+2.2、authentication标签
+
+这个标签允许访问当前的Authentication 对象， 保存在安全上下文中。比如，如果Authentication 的principal 属性是Spring Security 的UserDetails 对象的一个实例，就要使用
+
+	<sec:authentication property="principal.username" />   
+
+来渲染当前用户的名称。
+
+当然，它不必使用JSP 标签来实现这些功能，一些人更愿意在视图中保持逻辑越少越好。你可以在你的MVC 控制器中访问Authentication 对象（ 通过调用SecurityContextHolder.getContext().getAuthentication()） 然后直接在模型中添加数据，来渲染视图。
+
+2.3、accesscontrollist标签这个标签纸在使用Spring Security ACL 模块时才可以使用。它检测一个用逗号分隔的特定领域对象的需要权限列表。如果当前用户拥有这些权限的任何一个，标签内容就会被执行。否则，就会被略过。
+
+	<sec:accesscontrollist hasPermission="1,2" domainObject="${someObject}">
+		This will be shown if the user has either of the permissions 
+		represented by the values "1" or "2" on the given object.
+	</sec:accesscontrollist>
 
 # 增强Basic认证
 
@@ -123,6 +180,7 @@ IEncryptionManager通过调用IEncryptionKeyManager接口的getKey()方法获得
 在第二种方式中，token的请求必须通过https协议。缺点是密钥需要长期稳定，因为一旦密钥失效，将导致所有客户端的token失效，客户端需要重新申请新的token。
 
 以上无论那总方式都需要客户端具有定制http header的能力，将用base64加密的加密串替换成token。具体的内容参考 http 1.1 规范
+
 
 # CAS集成
 
