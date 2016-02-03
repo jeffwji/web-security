@@ -34,14 +34,23 @@ import com.wang.web.it.IntegrationTestBase;
 		"authentication.filter.captcha.maxAcceptedWordLength:1", "authentication.filter.captcha.randomWords:0" })
 @DirtiesContext
 public class SecurityControllerIT extends IntegrationTestBase {
+	String userName = "user";
+
 	@Override
 	public String getUsername() {
-		return "user";
+		return userName;
 	}
+
+	String password = "user";
 
 	@Override
 	public String getPassword() {
-		return "user";
+		return password;
+	}
+
+	@Override
+	public String encrypt(String str) throws Exception {
+		return encryptionManager.encrypt(str);
 	}
 
 	@Value("${local.server.port}") private int port;
@@ -49,7 +58,7 @@ public class SecurityControllerIT extends IntegrationTestBase {
 	@Value("${authentication.filter.enhanced_basic:true}") boolean enhancedBasic;
 
 	@Test
-	public void testLoginPage() throws Exception {
+	public void testGetLoginPage() throws Exception {
 		TestRestTemplate testRestTemplate = getRestTemplate(null, null);
 
 		HttpHeaders headers = new HttpHeaders();
@@ -64,40 +73,21 @@ public class SecurityControllerIT extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testPostAuthentication() throws Exception {
-		TestRestTemplate testRestTemplate = getRestTemplate(null, null);
-
+	public void testPostLoginFormWithoutBasicAuthentication() throws Exception {
 		MultiValueMap<String, String> form = new LinkedMultiValueMap<String, String>();
 		form.add("username", getUsername());
 		form.add("password", getPassword());
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-		//headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
-
-		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(form,
-				headers);
-		ResponseEntity<String> entity = request(testRestTemplate, "http://localhost:" + this.port + "/login",
-				HttpMethod.POST, request, String.class, true);
+		//To prevent username and password to be enclosed into basic authentication field, we temporally disable them. 
+		userName = password = null;
+		ResponseEntity<String> entity = post("http://localhost:" + this.port + "/login", form, String.class, true);
 
 		Assert.assertEquals(HttpStatus.NOT_FOUND, entity.getStatusCode());
 	}
 
 	@Test
-	public void testBasicAuthentication() throws Exception {
-		TestRestTemplate testRestTemplate = null;
-		HttpHeaders headers = new HttpHeaders();
-
-		if (enhancedBasic) {
-			testRestTemplate = getRestTemplate(null, null);
-			headers.add("Authorization", "Basic " + encryptionManager.encrypt(getUsername() + ":" + getPassword()));
-		}
-		else {
-			testRestTemplate = getRestTemplate();
-		}
-
-		ResponseEntity<String> entity = testRestTemplate.exchange("http://localhost:" + this.port + "/rest/user",
-				HttpMethod.GET, new HttpEntity<Void>(headers), String.class);
+	public void testGetByBasicAuthentication() throws Exception {
+		ResponseEntity<String> entity = get("http://localhost:" + this.port + "/rest/user", String.class);
 
 		Assert.assertEquals(HttpStatus.OK, entity.getStatusCode());
 		Assert.assertTrue(entity.getBody().contains("authorityName"));
