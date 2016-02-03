@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
@@ -65,6 +66,7 @@ import com.wang.security.utils.captcha.ImageCaptchaEngine;
 @EnableGlobalMethodSecurity
 @EnableWebSecurity
 @Configuration
+@EnableAutoConfiguration
 //@EnableConfigurationProperties({ PropertySourcesPlaceholderConfigurer.class })
 @PropertySource(value = "classpath:config/security.properties")
 public class SecurityConfigure {
