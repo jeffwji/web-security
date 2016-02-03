@@ -21,18 +21,6 @@ import com.wang.web.unit.ControllerTestBase;
 public class LoginControllerTest extends ControllerTestBase {
 	@Autowired UserProperties userProperties;
 
-	@Override
-	public String getUsername() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getPassword() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	@Test
 	public void TestGetLoginUserInformation() throws Exception {
 		UsernamePasswordToken token = new UsernamePasswordToken();

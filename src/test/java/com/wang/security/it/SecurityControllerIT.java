@@ -75,7 +75,8 @@ public class SecurityControllerIT extends IntegrationTestBase {
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 		//headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
 
-		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(form, headers);
+		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(form,
+				headers);
 		ResponseEntity<String> entity = request(testRestTemplate, "http://localhost:" + this.port + "/login",
 				HttpMethod.POST, request, String.class, true);
 

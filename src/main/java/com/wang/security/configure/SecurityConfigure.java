@@ -159,8 +159,11 @@ public class SecurityConfigure {
 				encryptionKeyManager = new IEncryptionKeyManager() {
 					@Override
 					public String getKey() {
-						if (null == encryptionKey || encryptionKey.length() == 0)
+						if (null == encryptionKey || encryptionKey.length() == 0) {
 							encryptionKey = UUID.randomUUID().toString();
+							encryptionKey = encryptionKey.length() > 24 ? encryptionKey.substring(0, 24)
+									: encryptionKey;
+						}
 						return encryptionKey;
 					}
 				};
