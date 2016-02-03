@@ -1,6 +1,7 @@
 package com.wang.security.it;
 
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -66,7 +67,7 @@ public class SecurityControllerIT extends IntegrationTestBase {
 		HttpEntity<String> requestEntity = new HttpEntity<String>(headers);
 
 		ResponseEntity<String> entity = request(testRestTemplate, "http://localhost:" + this.port + "/login",
-				HttpMethod.GET, requestEntity, String.class, false);
+				HttpMethod.GET, requestEntity, MediaType.ALL, Arrays.asList(MediaType.ALL), String.class, false);
 
 		Assert.assertEquals(HttpStatus.OK, entity.getStatusCode());
 		Assert.assertTrue(entity.getBody().contains("Login with Username and Password"));
@@ -87,9 +88,11 @@ public class SecurityControllerIT extends IntegrationTestBase {
 
 	@Test
 	public void testGetByBasicAuthentication() throws Exception {
-		ResponseEntity<String> entity = get("http://localhost:" + this.port + "/rest/user", String.class);
+		@SuppressWarnings("rawtypes") ResponseEntity<LinkedHashMap> entity = get(
+				"http://localhost:" + this.port + "/rest/user", MediaType.ALL,
+				Arrays.asList(MediaType.APPLICATION_JSON), LinkedHashMap.class, false);
 
 		Assert.assertEquals(HttpStatus.OK, entity.getStatusCode());
-		Assert.assertTrue(entity.getBody().contains("authorityName"));
+		Assert.assertTrue(entity.getBody().containsKey("authority"));
 	}
 }
