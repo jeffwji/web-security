@@ -1,4 +1,4 @@
-package com.wang.com.security.unit;
+package com.wang.security.unit;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;

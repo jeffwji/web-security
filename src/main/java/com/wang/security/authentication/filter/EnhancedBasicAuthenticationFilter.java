@@ -4,10 +4,9 @@ import java.io.IOException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.auth.AuthenticationException;
 import org.apache.log4j.Logger;
@@ -45,14 +44,14 @@ public class EnhancedBasicAuthenticationFilter extends BasicAuthenticationFilter
 	}
 
 	@Override
-	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException,
-			ServletException {
+	protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
+			throws IOException, ServletException {
 		if (enhancedBasic) {
 			req = new FakeHttpServletRequest((HttpServletRequest) req, encryptionManager);
 			logger.info("Basic authorization is enhanced.");
 		}
 
-		super.doFilter(req, res, chain);
+		super.doFilterInternal(req, res, chain);
 	}
 
 	private static class FakeHttpServletRequest extends HttpServletRequestWrapper {

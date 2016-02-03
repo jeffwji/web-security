@@ -17,13 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -66,7 +64,7 @@ import com.wang.security.utils.captcha.ImageCaptchaEngine;
 @EnableGlobalMethodSecurity
 @EnableWebSecurity
 @Configuration
-@EnableConfigurationProperties({ PropertySourcesPlaceholderConfigurer.class })
+//@EnableConfigurationProperties({ PropertySourcesPlaceholderConfigurer.class })
 @PropertySource(value = "classpath:config/security.properties")
 public class SecurityConfigure {
 
@@ -134,10 +132,10 @@ public class SecurityConfigure {
 			captchaAuthenticationFilter.setCaptchaEnabled(captchaEnabled);
 			captchaAuthenticationFilter.setCaptchaService(captchaService);
 			captchaAuthenticationFilter.setAuthenticationManager(authenticationManagerBean());
-			captchaAuthenticationFilter.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher(loginUrl,
-					"POST"));
-			captchaAuthenticationFilter.setAuthenticationFailureHandler(new SimpleUrlAuthenticationFailureHandler(
-					loginUrl + "?error"));
+			captchaAuthenticationFilter
+					.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher(loginUrl, "POST"));
+			captchaAuthenticationFilter
+					.setAuthenticationFailureHandler(new SimpleUrlAuthenticationFailureHandler(loginUrl + "?error"));
 			captchaAuthenticationFilter.setUsernameParameter("username");
 			captchaAuthenticationFilter.setPasswordParameter("password");
 			captchaAuthenticationFilter.afterPropertiesSet();

@@ -1,6 +1,7 @@
 package com.wang.security;
 
 import org.apache.log4j.Logger;
+import org.springframework.boot.Banner.Mode;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
@@ -20,9 +21,9 @@ public class WebSecurityMainClass {
 
 	public static void main(String[] args) {
 		SpringApplication app = new SpringApplication(WebSecurityMainClass.class);
-		app.setShowBanner(false);
+		app.setBannerMode(Mode.OFF);
 		app.run(args);
 
-		logger.info("Server is ended.");
+		logger.info("Server is running...");
 	}
 }

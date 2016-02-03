@@ -1,4 +1,4 @@
-package com.wang.com.security.it;
+package com.wang.security.it;
 
 import java.util.Arrays;
 
