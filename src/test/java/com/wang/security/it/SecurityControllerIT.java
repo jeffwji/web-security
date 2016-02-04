@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.TestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -22,6 +21,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import com.wang.security.WebSecurityMainClass;
 import com.wang.security.authentication.filter.EnhancedBasicAuthenticationFilter.IEncryptionManager;
@@ -35,6 +35,8 @@ import com.wang.web.it.IntegrationTestBase;
 		"authentication.filter.captcha.maxAcceptedWordLength:1", "authentication.filter.captcha.randomWords:0" })
 @DirtiesContext
 public class SecurityControllerIT extends IntegrationTestBase {
+	@Value("${local.server.port}") private int port;
+
 	String userName = "user";
 
 	@Override
@@ -49,25 +51,26 @@ public class SecurityControllerIT extends IntegrationTestBase {
 		return password;
 	}
 
+	@Autowired(required = false) IEncryptionManager encryptionManager;
+
 	@Override
 	public String encrypt(String str) throws Exception {
-		return encryptionManager.encrypt(str);
+		if (null != encryptionManager && getEnhancedBasic())
+			return encryptionManager.encrypt(str);
+		else
+			return super.encrypt(str);
 	}
-
-	@Value("${local.server.port}") private int port;
-	@Autowired(required = false) IEncryptionManager encryptionManager;
-	@Value("${authentication.filter.enhanced_basic:true}") boolean enhancedBasic;
 
 	@Test
 	public void testGetLoginPage() throws Exception {
-		TestRestTemplate testRestTemplate = getRestTemplate(null, null);
+		RestTemplate testRestTemplate = getRestTemplate();
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setAccept(Arrays.asList(MediaType.TEXT_HTML));
 		HttpEntity<String> requestEntity = new HttpEntity<String>(headers);
 
 		ResponseEntity<String> entity = request(testRestTemplate, "http://localhost:" + this.port + "/login",
-				HttpMethod.GET, requestEntity, MediaType.ALL, Arrays.asList(MediaType.ALL), String.class, false);
+				HttpMethod.GET, requestEntity, Arrays.asList(MediaType.ALL), String.class, false);
 
 		Assert.assertEquals(HttpStatus.OK, entity.getStatusCode());
 		Assert.assertTrue(entity.getBody().contains("Login with Username and Password"));
@@ -89,8 +92,8 @@ public class SecurityControllerIT extends IntegrationTestBase {
 	@Test
 	public void testGetByBasicAuthentication() throws Exception {
 		@SuppressWarnings("rawtypes") ResponseEntity<LinkedHashMap> entity = get(
-				"http://localhost:" + this.port + "/rest/user", MediaType.ALL,
-				Arrays.asList(MediaType.APPLICATION_JSON), LinkedHashMap.class, false);
+				"http://localhost:" + this.port + "/rest/user", Arrays.asList(MediaType.APPLICATION_JSON),
+				LinkedHashMap.class, false);
 
 		Assert.assertEquals(HttpStatus.OK, entity.getStatusCode());
 		Assert.assertTrue(entity.getBody().containsKey("authority"));
