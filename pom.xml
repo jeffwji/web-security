@@ -20,8 +20,8 @@
 	</properties>
 	
 	<scm>
-	    <connection>scm:git:https://github.com/meee55/web-security.git</connection>
-	    <developerConnection>scm:git:https://github.com/meee55/web-security.git</developerConnection>
+	    <connection>scm:git:https://github.com/tinybrick/web-security.git</connection>
+	    <developerConnection>scm:git:https://github.com/tinybrick/web-security.git</developerConnection>
 	</scm>
 	
 	<!-- <repositories>
@@ -109,7 +109,7 @@
 		            <artifactId>spring-boot-maven-plugin</artifactId>
 		            <version>${spring.boot.version}</version>
 		            <configuration>
-		            	<layer>NONE</layer>
+		            	<layout>NONE</layout>
 		            	<skip>true</skip>
 		            </configuration>
 				      <executions>
@@ -126,8 +126,8 @@
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>3.0</version>
 					<configuration>
-						<source>1.7</source>
-						<target>1.7</target>
+						<source>1.8</source>
+						<target>1.8</target>
 					</configuration>
 				</plugin>
 
