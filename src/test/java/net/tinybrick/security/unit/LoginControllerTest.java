@@ -13,8 +13,8 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.ResultActions;
 
 import net.tinybrick.security.configure.SecurityConfigure;
-import com.wang.web.configure.ApplicationCoreConfigure;
-import com.wang.web.unit.ControllerTestBase;
+import net.tinybrick.web.configure.ApplicationCoreConfigure;
+import net.tinybrick.test.web.unit.ControllerTestBase;
 
 @SpringApplicationConfiguration(classes = { SecurityConfigure.class, ApplicationCoreConfigure.class })
 @TestPropertySource(locations = "classpath:config/security.properties")

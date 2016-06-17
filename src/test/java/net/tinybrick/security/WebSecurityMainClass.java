@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 
-import com.wang.web.configure.ApplicationCoreConfigure;
+import net.tinybrick.web.configure.ApplicationCoreConfigure;
 
 /**
  * Hello world!

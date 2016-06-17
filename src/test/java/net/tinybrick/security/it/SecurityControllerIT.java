@@ -25,7 +25,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import net.tinybrick.security.authentication.filter.EnhancedBasicAuthenticationFilter.IEncryptionManager;
-import com.wang.web.it.IntegrationTestBase;
+import net.tinybrick.test.web.it.IntegrationTestBase;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = WebSecurityMainClass.class)
