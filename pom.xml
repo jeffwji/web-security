@@ -226,7 +226,7 @@
 	<dependencies>
 		<!-- Test -->
 		<dependency>
-			<groupId>com.wang</groupId>
+			<groupId>net.tinybrick</groupId>
 			<artifactId>test</artifactId>
 			<version>${test.version}</version>
 			<scope>test</scope>
@@ -254,14 +254,14 @@
 
 		<!-- htche-web -->
 		<dependency>
-		    <groupId>com.wang</groupId>
+		    <groupId>net.tinybrick</groupId>
 		    <artifactId>web-core</artifactId>
 		    <version>${web-core.version}</version>
 		    <scope>provided</scope>
 		</dependency>
 		
 		<dependency>
-		    <groupId>com.wang</groupId>
+		    <groupId>net.tinybrick</groupId>
 		    <artifactId>utils</artifactId>
 		    <version>${utils.version}</version>
 		</dependency>

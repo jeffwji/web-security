@@ -8,7 +8,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import net.tinybrick.security.exception.InvalidCaptacheException;
-import com.wang.utils.i18n.I18N;
+import net.tinybrick.utils.i18n.I18N;
 import com.octo.captcha.service.image.ImageCaptchaService;
 
 public class CaptchaAuthenticationFilter extends UsernamePasswordAuthenticationFilter {

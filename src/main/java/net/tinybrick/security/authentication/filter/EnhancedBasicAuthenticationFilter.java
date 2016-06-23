@@ -13,8 +13,8 @@ import org.apache.log4j.Logger;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
-import com.wang.utils.crypto.Codec;
-import com.wang.utils.crypto.DES3;
+import net.tinybrick.utils.crypto.Codec;
+import net.tinybrick.utils.crypto.DES3;
 
 public class EnhancedBasicAuthenticationFilter extends BasicAuthenticationFilter {
 	Logger logger = Logger.getLogger(this.getClass());
