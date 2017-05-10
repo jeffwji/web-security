@@ -16,7 +16,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import net.tinybrick.utils.crypto.Codec;
 import net.tinybrick.utils.crypto.DES3;
 
-public class BearerAuthenticationFilter extends BasicAuthenticationFilter {
+public class EnhancedBasicAuthenticationFilter extends BasicAuthenticationFilter {
 	Logger logger = Logger.getLogger(this.getClass());
 
 	boolean enhancedBasic = true;
@@ -39,7 +39,7 @@ public class BearerAuthenticationFilter extends BasicAuthenticationFilter {
 		this.encryptionManager = encryptionManager;
 	}
 
-	public BearerAuthenticationFilter(AuthenticationManager authenticationManagerBean) {
+	public EnhancedBasicAuthenticationFilter(AuthenticationManager authenticationManagerBean) {
 		super(authenticationManagerBean);
 	}
 
@@ -58,7 +58,7 @@ public class BearerAuthenticationFilter extends BasicAuthenticationFilter {
 		Logger logger = Logger.getLogger(this.getClass());
 
 		static final String AUTHORIZATION_TOKEN = "Authorization";
-		static final String AUTHORIZATION_BASIC_TOKEN = "Bearer ";
+		static final String AUTHORIZATION_BASIC_TOKEN = "Basic ";
 
 		private IEncryptionManager encryptionManager;
 
