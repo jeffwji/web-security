@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 
 import net.tinybrick.security.WebSecurityMainClass;
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,6 +36,8 @@ import net.tinybrick.test.web.it.IntegrationTestBase;
 		"authentication.filter.captcha.maxAcceptedWordLength:1", "authentication.filter.captcha.randomWords:0" })
 @DirtiesContext
 public class SecurityControllerIT extends IntegrationTestBase {
+	Logger logger = Logger.getLogger(this.getClass());
+
 	@Value("${local.server.port}") private int port;
 
 	String userName = "user";
@@ -49,6 +52,16 @@ public class SecurityControllerIT extends IntegrationTestBase {
 	@Override
 	public String getPassword() {
 		return password;
+	}
+
+	public String getBearer() {
+		try {
+			return this.encrypt(this.getUsername() + ":" + this.getPassword());
+		}
+		catch(Exception e){
+			logger.error(e.getMessage(), e);
+			return "";
+		}
 	}
 
 	@Autowired(required = false) IEncryptionManager encryptionManager;
@@ -78,6 +91,7 @@ public class SecurityControllerIT extends IntegrationTestBase {
 
 	@Test
 	public void testPostLoginFormWithoutBasicAuthentication() throws Exception {
+		setAuthenticationMethod(null);
 		MultiValueMap<String, String> form = new LinkedMultiValueMap<String, String>();
 		form.add("username", getUsername());
 		form.add("password", getPassword());
@@ -91,6 +105,19 @@ public class SecurityControllerIT extends IntegrationTestBase {
 
 	@Test
 	public void testGetByBasicAuthentication() throws Exception {
+		setAuthenticationMethod(AUTHENTICATION_METHOD.Basic);
+		@SuppressWarnings("rawtypes") ResponseEntity<LinkedHashMap> entity = get(
+				"http://localhost:" + this.port + "/rest/user", Arrays.asList(MediaType.APPLICATION_JSON),
+				LinkedHashMap.class, false);
+
+		Assert.assertEquals(HttpStatus.OK, entity.getStatusCode());
+		Assert.assertTrue(entity.getBody().containsKey("authority"));
+	}
+
+	@Test
+	public void testGetByBearerAuthentication() throws Exception {
+		setAuthenticationMethod(AUTHENTICATION_METHOD.Bearer);
+
 		@SuppressWarnings("rawtypes") ResponseEntity<LinkedHashMap> entity = get(
 				"http://localhost:" + this.port + "/rest/user", Arrays.asList(MediaType.APPLICATION_JSON),
 				LinkedHashMap.class, false);

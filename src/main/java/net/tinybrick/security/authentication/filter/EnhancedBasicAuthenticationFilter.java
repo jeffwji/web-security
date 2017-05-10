@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
+import net.tinybrick.utils.rest.IRestClient;
 import org.apache.http.auth.AuthenticationException;
 import org.apache.log4j.Logger;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,7 +20,7 @@ import net.tinybrick.utils.crypto.DES3;
 public class EnhancedBasicAuthenticationFilter extends BasicAuthenticationFilter {
 	Logger logger = Logger.getLogger(this.getClass());
 
-	boolean enhancedBasic = true;
+	static boolean enhancedBasic = true;
 
 	public boolean isEnhancedBasic() {
 		return enhancedBasic;
@@ -46,10 +47,10 @@ public class EnhancedBasicAuthenticationFilter extends BasicAuthenticationFilter
 	@Override
 	protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
 			throws IOException, ServletException {
-		if (enhancedBasic) {
+		//if (enhancedBasic) {
 			req = new FakeHttpServletRequest((HttpServletRequest) req, encryptionManager);
 			logger.info("Basic authorization is enhanced.");
-		}
+		//}
 
 		super.doFilterInternal(req, res, chain);
 	}
@@ -58,7 +59,8 @@ public class EnhancedBasicAuthenticationFilter extends BasicAuthenticationFilter
 		Logger logger = Logger.getLogger(this.getClass());
 
 		static final String AUTHORIZATION_TOKEN = "Authorization";
-		static final String AUTHORIZATION_BASIC_TOKEN = "Basic ";
+		static final String AUTHORIZATION_BASIC_TOKEN = IRestClient.AUTHENTICATION_METHOD.Basic.toString();
+		static final String AUTHORIZATION_BEARER_TOKEN = IRestClient.AUTHENTICATION_METHOD.Bearer.toString();
 
 		private IEncryptionManager encryptionManager;
 
@@ -83,10 +85,10 @@ public class EnhancedBasicAuthenticationFilter extends BasicAuthenticationFilter
 
 			//if we are looking for the "Authorization" request header
 			if (name.equals(AUTHORIZATION_TOKEN) && null != header) {
-				logger.debug("Enhanced token is found.");
-
 				try {
-					header = decryptToken(header);
+					if(header.startsWith(AUTHORIZATION_BEARER_TOKEN) || enhancedBasic) {
+						header = decryptToken(header);
+					}
 				}
 				catch (AuthenticationException e) {
 					throw new RuntimeException(e);
@@ -99,12 +101,13 @@ public class EnhancedBasicAuthenticationFilter extends BasicAuthenticationFilter
 
 		private String decryptToken(String token) throws AuthenticationException {
 			if (null != encryptionManager) {
-				String des = token;
+				String[] tokenParts = token.split(" ");
+				String tokenType = tokenParts[0].trim();
+				String des = tokenParts[1].trim();
 				try {
-					token = AUTHORIZATION_BASIC_TOKEN
-							+ Codec.stringToBase64(encryptionManager.decrypt(token.substring(6)));
-				}
-				catch (Exception e) {
+					token = AUTHORIZATION_BASIC_TOKEN + " "
+							+ Codec.stringToBase64(encryptionManager.decrypt(des));
+				} catch (Exception e) {
 					logger.error(e.getMessage(), e);
 					throw new AuthenticationException(e.getMessage(), e);
 				}
