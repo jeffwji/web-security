@@ -17,7 +17,7 @@ import net.tinybrick.security.authentication.IHttpSecurityConfigure;
 import net.tinybrick.security.authentication.UserProperties;
 import net.tinybrick.security.authentication.UsernamePasswordAuthenticationProvider;
 import net.tinybrick.security.authentication.filter.CaptchaAuthenticationFilter;
-import net.tinybrick.security.authentication.filter.EnhancedBasicAuthenticationFilter;
+import net.tinybrick.security.authentication.filter.BearerAuthenticationFilter;
 import net.tinybrick.security.utils.captcha.ImageCaptchaEngine;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -150,12 +150,12 @@ public class SecurityConfigure {
 		@Value("${authentication.filter.enhanced_basic.key:}") String encryptionKey;
 
 		@Autowired(required = false)
-		EnhancedBasicAuthenticationFilter.IEncryptionKeyManager encryptionKeyManager;
+		BearerAuthenticationFilter.IEncryptionKeyManager encryptionKeyManager;
 
 		@Bean
-		protected EnhancedBasicAuthenticationFilter.IEncryptionKeyManager encryptionKeyManager() {
+		protected BearerAuthenticationFilter.IEncryptionKeyManager encryptionKeyManager() {
 			if (null == encryptionKeyManager) {
-				encryptionKeyManager = new EnhancedBasicAuthenticationFilter.IEncryptionKeyManager() {
+				encryptionKeyManager = new BearerAuthenticationFilter.IEncryptionKeyManager() {
 					@Override
 					public String getKey() {
 						if (null == encryptionKey || encryptionKey.length() == 0) {
@@ -174,12 +174,12 @@ public class SecurityConfigure {
 		}
 
 		@Autowired(required = false)
-		EnhancedBasicAuthenticationFilter.IEncryptionManager encryptionManager;
+		BearerAuthenticationFilter.IEncryptionManager encryptionManager;
 
 		@Bean
-		protected EnhancedBasicAuthenticationFilter.IEncryptionManager encryptionManager() throws Exception {
+		protected BearerAuthenticationFilter.IEncryptionManager encryptionManager() throws Exception {
 			if (null == encryptionManager) {
-				encryptionManager = new EnhancedBasicAuthenticationFilter.Des3EncryptionManager(encryptionKeyManager());
+				encryptionManager = new BearerAuthenticationFilter.Des3EncryptionManager(encryptionKeyManager());
 			}
 
 			return encryptionManager;
@@ -187,8 +187,8 @@ public class SecurityConfigure {
 
 		@Value("${authentication.filter.enhanced_basic:true}") boolean enhancedBasic;
 
-		protected EnhancedBasicAuthenticationFilter enhancedBasicAuthenticationFilter() throws Exception {
-			EnhancedBasicAuthenticationFilter enhancedBasicAuthenticationFilter = new EnhancedBasicAuthenticationFilter(
+		protected BearerAuthenticationFilter enhancedBasicAuthenticationFilter() throws Exception {
+			BearerAuthenticationFilter enhancedBasicAuthenticationFilter = new BearerAuthenticationFilter(
 					authenticationManagerBean());
 			enhancedBasicAuthenticationFilter.setEnhancedBasic(enhancedBasic);
 			enhancedBasicAuthenticationFilter.setEncryptionManager(encryptionManager());
@@ -218,7 +218,7 @@ public class SecurityConfigure {
 			logger.info(CaptchaAuthenticationFilter.class.getName() + "is added.");
 
 			http.addFilterBefore(enhancedBasicAuthenticationFilter(), BasicAuthenticationFilter.class);
-			logger.info(EnhancedBasicAuthenticationFilter.class.getName() + "is added.");
+			logger.info(BearerAuthenticationFilter.class.getName() + "is added.");
 		}
 
 		@Override
