@@ -3,6 +3,7 @@ package net.tinybrick.security.configure;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,6 +30,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -36,6 +39,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -71,10 +76,11 @@ import com.octo.captcha.service.image.ImageCaptchaService;
 //@EnableConfigurationProperties({ PropertySourcesPlaceholderConfigurer.class })
 @PropertySource(value = "classpath:config/security.properties")
 public class SecurityConfigure {
-	@Bean
+
+	/*@Bean
 	public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
 		return new PropertySourcesPlaceholderConfigurer();
-	}
+	}*/
 
 	@Bean
 	@Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
@@ -116,6 +122,9 @@ public class SecurityConfigure {
 	@Configuration
 	@Order(SecurityProperties.ACCESS_OVERRIDE_ORDER + 0)
 	public static class EnhancedWebSecurityConfigureAdapter extends WebSecurityConfigurerAdapter {
+        @Autowired
+        private ApplicationContext appContext;
+
 		final Logger logger = Logger.getLogger(this.getClass());
 
 		@Autowired private SecurityProperties security;
@@ -160,8 +169,17 @@ public class SecurityConfigure {
 		@Bean
 		protected EnhancedBasicAuthenticationFilter.IEncryptionKeyManager encryptionKeyManager() throws IOException, DecoderException {
 			if (null == encryptionKeyManager) {
-				encryptionKeyManager = new RsaEncryptionKeyManager(publicKeyFileName, privateKeyFileName);
-				logger.info("No EncryptionKeyManager instance has been found. a default one has been created.");
+                if((null != publicKeyFileName && publicKeyFileName.trim().length() > 0)
+                        && (null != privateKeyFileName && privateKeyFileName.trim().length() > 0)) {
+                    InputStream publicKeyInput =  appContext.getResource(publicKeyFileName).getInputStream();
+                    InputStream privateKeyInput = appContext.getResource(privateKeyFileName).getInputStream();
+
+                    encryptionKeyManager = new RsaEncryptionKeyManager(publicKeyInput, privateKeyInput);
+                }
+                else {
+                    encryptionKeyManager = new RsaEncryptionKeyManager();
+                }
+                logger.info("No EncryptionKeyManager instance has been found. a default one has been created.");
 			}
 
 			return encryptionKeyManager;

@@ -6,8 +6,7 @@ import net.tinybrick.utils.crypto.RSA;
 import org.apache.commons.codec.DecoderException;
 import org.apache.log4j.Logger;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,6 +23,16 @@ public class RsaEncryptionKeyManager implements EnhancedBasicAuthenticationFilte
     byte[] privateKey = null;
 
     public RsaEncryptionKeyManager() {
+    }
+
+    public RsaEncryptionKeyManager(InputStream  publicKeyInput, InputStream privateKeyFileName) throws IOException, DecoderException {
+        publicKey = getByteFromInput(publicKeyInput);
+        privateKey = getByteFromInput(privateKeyFileName);
+    }
+
+    protected byte[] getByteFromInput(InputStream in) throws IOException, DecoderException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        return Codec.fromBas64(reader.readLine());
     }
 
     public RsaEncryptionKeyManager(String publicKeyFileName, String privateKeyFileName) throws IOException, DecoderException {
