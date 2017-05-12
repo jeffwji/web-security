@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
+import net.tinybrick.utils.crypto.RSA;
 import net.tinybrick.utils.rest.IRestClient;
 import org.apache.http.auth.AuthenticationException;
 import org.apache.log4j.Logger;
@@ -120,35 +121,12 @@ public class EnhancedBasicAuthenticationFilter extends BasicAuthenticationFilter
 	}
 
 	public static interface IEncryptionKeyManager {
-		String getKey();
+		Object getEncryptKey();
+		Object getDecryptKey();
 	}
 
 	public static interface IEncryptionManager {
 		String encrypt(String str) throws Exception;
-
 		String decrypt(String str) throws Exception;
-	}
-
-	public static class Des3EncryptionManager implements IEncryptionManager {
-		Logger logger = Logger.getLogger(this.getClass());
-		IEncryptionKeyManager keyManager = null;
-
-		public Des3EncryptionManager(IEncryptionKeyManager keyManager) throws Exception {
-			this.keyManager = keyManager;
-		}
-
-		@Override
-		public String encrypt(String str) throws Exception {
-			String res = DES3.encrypt(keyManager.getKey(), str);
-			logger.debug(str + " has been encrypted to " + res);
-			return res;
-		}
-
-		@Override
-		public String decrypt(String str) throws Exception {
-			String res = DES3.decrypt(keyManager.getKey(), str);
-			logger.debug(str + " has been decrypted to " + res);
-			return res;
-		}
 	}
 }

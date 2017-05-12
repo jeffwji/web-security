@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletOutputStream;
@@ -18,7 +17,12 @@ import net.tinybrick.security.authentication.UserProperties;
 import net.tinybrick.security.authentication.UsernamePasswordAuthenticationProvider;
 import net.tinybrick.security.authentication.filter.CaptchaAuthenticationFilter;
 import net.tinybrick.security.authentication.filter.EnhancedBasicAuthenticationFilter;
+import net.tinybrick.security.authentication.filter.tools.Des3EncryptionKeyManager;
+import net.tinybrick.security.authentication.filter.tools.Des3EncryptionManager;
+import net.tinybrick.security.authentication.filter.tools.RsaEncryptionKeyManager;
+import net.tinybrick.security.authentication.filter.tools.RsaEncryptionManager;
 import net.tinybrick.security.utils.captcha.ImageCaptchaEngine;
+import org.apache.commons.codec.DecoderException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -147,26 +151,16 @@ public class SecurityConfigure {
 			return captchaAuthenticationFilter;
 		}
 
-		@Value("${authentication.filter.enhanced_basic.key:}") String encryptionKey;
-
+		//@Value("${authentication.filter.enhanced_basic.key:}") String encryptionKey;
+		@Value("${authentication.filter.secure.public_key_file:}") String publicKeyFileName;
+		@Value("${authentication.filter.secure.private_key_file:}") String privateKeyFileName;
 		@Autowired(required = false)
 		EnhancedBasicAuthenticationFilter.IEncryptionKeyManager encryptionKeyManager;
 
 		@Bean
-		protected EnhancedBasicAuthenticationFilter.IEncryptionKeyManager encryptionKeyManager() {
+		protected EnhancedBasicAuthenticationFilter.IEncryptionKeyManager encryptionKeyManager() throws IOException, DecoderException {
 			if (null == encryptionKeyManager) {
-				encryptionKeyManager = new EnhancedBasicAuthenticationFilter.IEncryptionKeyManager() {
-					@Override
-					public String getKey() {
-						if (null == encryptionKey || encryptionKey.length() == 0) {
-							encryptionKey = UUID.randomUUID().toString();
-							encryptionKey = encryptionKey.length() > 24 ? encryptionKey.substring(0, 24)
-									: encryptionKey;
-						}
-						return encryptionKey;
-					}
-				};
-
+				encryptionKeyManager = new RsaEncryptionKeyManager(publicKeyFileName, privateKeyFileName);
 				logger.info("No EncryptionKeyManager instance has been found. a default one has been created.");
 			}
 
@@ -179,7 +173,7 @@ public class SecurityConfigure {
 		@Bean
 		protected EnhancedBasicAuthenticationFilter.IEncryptionManager encryptionManager() throws Exception {
 			if (null == encryptionManager) {
-				encryptionManager = new EnhancedBasicAuthenticationFilter.Des3EncryptionManager(encryptionKeyManager());
+				encryptionManager = new RsaEncryptionManager(encryptionKeyManager());
 			}
 
 			return encryptionManager;

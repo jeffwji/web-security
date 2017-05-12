@@ -190,6 +190,8 @@
 				<directory>src/main/resources</directory>
 				<excludes>
 					<exclude>keystore</exclude>
+					<exclude>rsa_id</exclude>
+					<exclude>rsa_id.pub</exclude>
 				</excludes>
 			</resource>
 
@@ -198,6 +200,8 @@
 				<directory>src/main/resources</directory>
 				<includes>
 					<include>keystore</include>
+					<include>rsa_id</include>
+					<include>rsa_id.pub</include>
 				</includes>
 			</resource>
 
@@ -220,8 +224,20 @@
 			<testResource>
 				<filtering>true</filtering>
 				<directory>src/test/resources</directory>
+				<excludes>
+					<exclude>keystore</exclude>
+					<exclude>rsa_id</exclude>
+					<exclude>rsa_id.pub</exclude>
+				</excludes>
+			</testResource>
+
+			<testResource>
+				<filtering>false</filtering>
+				<directory>src/test/resources</directory>
 				<includes>
-					<include>*</include>
+					<include>keystore</include>
+					<include>rsa_id</include>
+					<include>rsa_id.pub</include>
 				</includes>
 			</testResource>
 		</testResources>
