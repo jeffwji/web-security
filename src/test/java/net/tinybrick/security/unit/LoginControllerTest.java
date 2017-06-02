@@ -29,8 +29,8 @@ public class LoginControllerTest extends ControllerTestBase {
 		userProperties.setCredential(token);
 
 		ResultActions resultActions;
-		//更新车辆属性信息
-		resultActions = GET("/rest/user", MediaType.APPLICATION_JSON, MediaType.APPLICATION_JSON);
+
+		resultActions = GET("/rest/v1/user", MediaType.APPLICATION_JSON, MediaType.APPLICATION_JSON);
 		resultActions.andDo(print()).andExpect(status().isOk());
 	}
 }

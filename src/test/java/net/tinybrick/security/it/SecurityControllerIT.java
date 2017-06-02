@@ -107,7 +107,7 @@ public class SecurityControllerIT extends IntegrationTestBase {
 	public void testGetByBasicAuthentication() throws Exception {
 		setAuthenticationMethod(AUTHENTICATION_METHOD.Basic);
 		@SuppressWarnings("rawtypes") ResponseEntity<LinkedHashMap> entity = get(
-				"http://localhost:" + this.port + "/rest/user", Arrays.asList(MediaType.APPLICATION_JSON),
+				"http://localhost:" + this.port + "/rest/v1/user", Arrays.asList(MediaType.APPLICATION_JSON),
 				LinkedHashMap.class, false);
 
 		Assert.assertEquals(HttpStatus.OK, entity.getStatusCode());
@@ -119,7 +119,7 @@ public class SecurityControllerIT extends IntegrationTestBase {
 		setAuthenticationMethod(AUTHENTICATION_METHOD.Bearer);
 
 		@SuppressWarnings("rawtypes") ResponseEntity<LinkedHashMap> entity = get(
-				"http://localhost:" + this.port + "/rest/user", Arrays.asList(MediaType.APPLICATION_JSON),
+				"http://localhost:" + this.port + "/rest/v1/user", Arrays.asList(MediaType.APPLICATION_JSON),
 				LinkedHashMap.class, false);
 
 		Assert.assertEquals(HttpStatus.OK, entity.getStatusCode());

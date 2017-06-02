@@ -243,67 +243,110 @@
 		</testResources>
 	</build>
 
+	<dependencyManagement>
+		<dependencies>
+			<!-- Test -->
+			<dependency>
+				<groupId>net.tinybrick</groupId>
+				<artifactId>test</artifactId>
+				<version>${test.version}</version>
+				<scope>test</scope>
+			</dependency>
+
+			<!-- HttpClient -->
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpcore</artifactId>
+				<version>4.4.1</version>
+			</dependency>
+
+			<!-- Spring boot -->
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-security</artifactId>
+				<version>${spring.boot.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-starter-logging</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+
+			<!-- htche-web -->
+			<dependency>
+				<groupId>net.tinybrick</groupId>
+				<artifactId>web-core</artifactId>
+				<version>${web-core.version}</version>
+				<scope>provided</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>net.tinybrick</groupId>
+				<artifactId>utils</artifactId>
+				<version>${utils.version}</version>
+			</dependency>
+
+			<!-- Captcha -->
+			<dependency>
+				<groupId>com.octo.captcha</groupId>
+				<artifactId>jcaptcha</artifactId>
+				<version>1.0</version>
+				<exclusions>
+					<exclusion>
+						<groupId>javax.servlet</groupId>
+						<artifactId>servlet-api</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+
+			<dependency>
+				<groupId>com.jhlabs</groupId>
+				<artifactId>imaging</artifactId>
+				<version>01012005</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<dependencies>
 		<!-- Test -->
 		<dependency>
 			<groupId>net.tinybrick</groupId>
 			<artifactId>test</artifactId>
-			<version>${test.version}</version>
-			<scope>test</scope>
 		</dependency>
 
 		<!-- HttpClient -->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpcore</artifactId>
-			<version>4.4.1</version>
 		</dependency>
 
 		<!-- Spring boot -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
-			<version>${spring.boot.version}</version>
-			<exclusions>
-	            <exclusion>
-	                <groupId>org.springframework.boot</groupId>
-	                <artifactId>spring-boot-starter-logging</artifactId>
-	            </exclusion>
-	        </exclusions>
 		</dependency>
 
 		<!-- htche-web -->
 		<dependency>
 		    <groupId>net.tinybrick</groupId>
 		    <artifactId>web-core</artifactId>
-		    <version>${web-core.version}</version>
-		    <scope>provided</scope>
 		</dependency>
 		
 		<dependency>
 		    <groupId>net.tinybrick</groupId>
 		    <artifactId>utils</artifactId>
-		    <version>${utils.version}</version>
 		</dependency>
 		
 		<!-- Captcha -->
 		<dependency>
 			<groupId>com.octo.captcha</groupId>
 			<artifactId>jcaptcha</artifactId>
-			<version>1.0</version>
-			<exclusions>
-				<exclusion>
-					<groupId>javax.servlet</groupId>
-					<artifactId>servlet-api</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 
         <dependency>
             <groupId>com.jhlabs</groupId>
             <artifactId>imaging</artifactId>
-            <version>01012005</version>
         </dependency>
-
     </dependencies>
 </project>

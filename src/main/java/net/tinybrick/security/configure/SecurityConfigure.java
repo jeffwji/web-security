@@ -4,7 +4,10 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.Principal;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
@@ -18,8 +21,6 @@ import net.tinybrick.security.authentication.UserProperties;
 import net.tinybrick.security.authentication.UsernamePasswordAuthenticationProvider;
 import net.tinybrick.security.authentication.filter.CaptchaAuthenticationFilter;
 import net.tinybrick.security.authentication.filter.EnhancedBasicAuthenticationFilter;
-import net.tinybrick.security.authentication.filter.tools.Des3EncryptionKeyManager;
-import net.tinybrick.security.authentication.filter.tools.Des3EncryptionManager;
 import net.tinybrick.security.authentication.filter.tools.RsaEncryptionKeyManager;
 import net.tinybrick.security.authentication.filter.tools.RsaEncryptionManager;
 import net.tinybrick.security.utils.captcha.ImageCaptchaEngine;
@@ -30,17 +31,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -130,7 +127,7 @@ public class SecurityConfigure {
 		@Autowired private SecurityProperties security;
 		@Autowired AuthenticationProvider authenticationProvider;
 		@Autowired(required = false)
-		IHttpSecurityConfigure httpSecurityConfigure;
+        List<IHttpSecurityConfigure> httpSecurityConfigure;
 		@Autowired ImageCaptchaService captchaService;
 
 		@Bean
@@ -209,22 +206,27 @@ public class SecurityConfigure {
 
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
-			http.csrf().disable().formLogin().loginPage(loginUrl).failureUrl(loginUrl + "?error").permitAll().and()
-					.logout().deleteCookies("JSESSIONID").logoutRequestMatcher(new AntPathRequestMatcher(logoutUrl))
-					.logoutSuccessUrl(loginUrl).and().authorizeRequests().antMatchers("/captcha/**").permitAll().and()
-					.authorizeRequests().antMatchers("/images/**").permitAll().and().authorizeRequests()
-					.antMatchers("/css/**").permitAll().and().authorizeRequests().antMatchers("/js/**").permitAll()
-					.and().authorizeRequests().antMatchers("/static/**").permitAll().and().authorizeRequests()
-					.antMatchers("/public/**").permitAll();
+			http.csrf().disable().formLogin().loginPage(loginUrl).failureUrl(loginUrl + "?error").permitAll()
+					.and().logout().deleteCookies("JSESSIONID")
+					.logoutRequestMatcher(new AntPathRequestMatcher(logoutUrl)).logoutSuccessUrl(loginUrl)
+					.and().authorizeRequests().antMatchers(loginUrl+"/**").permitAll()
+					.and().authorizeRequests().antMatchers("/captcha/**").permitAll()
+					.and().authorizeRequests().antMatchers("/images/**").permitAll()
+					.and().authorizeRequests().antMatchers("/css/**").permitAll()
+					.and().authorizeRequests().antMatchers("/js/**").permitAll()
+					.and().authorizeRequests().antMatchers("/static/**").permitAll()
+					.and().authorizeRequests().antMatchers("/public/**").permitAll();
 
 			if (null != httpSecurityConfigure) {
 				logger.info("Apply customized security configure.");
-				httpSecurityConfigure.configure(http);
+				for(IHttpSecurityConfigure configurer:httpSecurityConfigure)
+                    configurer.configure(http);
 			}
-			else {
+
+			//else {
 				logger.info("Apply default security configure.");
 				http.authorizeRequests().anyRequest().fullyAuthenticated().and().httpBasic();
-			}
+			//}
 
 			http.addFilterBefore(captchaAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 			logger.info(CaptchaAuthenticationFilter.class.getName() + "is added.");
@@ -302,7 +304,7 @@ public class SecurityConfigure {
 	}
 
 	@RestController
-	@RequestMapping("/rest")
+	@RequestMapping("/rest/v1")
 	public static class SecurityController {
 		final Logger logger = Logger.getLogger(this.getClass());
 
@@ -310,12 +312,20 @@ public class SecurityConfigure {
 
 		@RequestMapping(value = "user", consumes = { MediaType.ALL_VALUE }, produces = {
 				MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
-		public @ResponseBody ResponseEntity<Map<String, Object>> user() {
+		public @ResponseBody ResponseEntity<Map<String, Object>> user(Principal principal) {
 			Map<String, Object> userInfoMap = new HashMap<String, Object>();
 			userInfoMap.put("username", userProperties.getCredential().getUsername());
 			userInfoMap.put("authority", userProperties.getAuthorities());
+            userInfoMap.put("principal", principal);
 
 			return new ResponseEntity<Map<String, Object>>(userInfoMap, HttpStatus.OK);
 		}
-	}
+
+        /*@RequestMapping({"/user", "/me"})
+        public Map<String, String> user(Principal principal) {
+            Map<String, String> map = new LinkedHashMap<String, String>();
+            map.put("name", null == principal ? "null" : principal.getName());
+            return map;
+        }*/
+    }
 }
