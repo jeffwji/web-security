@@ -11,7 +11,7 @@ import org.springframework.security.core.AuthenticationException;
 public class AuthenticationService implements IAuthenticationService {
 	Logger logger = LoggerFactory.getLogger(getClass());
 
-	@Autowired protected UserProperties userPreferences;
+	//@Autowired protected UserProperties userPreferences;
 
 	@Autowired(required = false) protected ISecurityService securityService;
 
@@ -21,8 +21,8 @@ public class AuthenticationService implements IAuthenticationService {
 
 		authorityList = securityService.getAuthorities(token);
 
-		userPreferences.setCredential(token);
-		userPreferences.setAuthorities(authorityList);
+		//userPreferences.setCredential(token);
+		//userPreferences.setAuthorities(authorityList);
 
 		return authorityList;
 	}

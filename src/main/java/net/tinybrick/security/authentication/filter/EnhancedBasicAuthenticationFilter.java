@@ -101,13 +101,14 @@ public class EnhancedBasicAuthenticationFilter extends BasicAuthenticationFilter
 		}
 
 		private String decryptToken(String token) throws AuthenticationException {
+			String[] tokenParts = token.split(" ");
+			String tokenType = tokenParts[0].trim();
+			String codec = tokenParts[1].trim();
+
 			if (null != encryptionManager) {
-				String[] tokenParts = token.split(" ");
-				String tokenType = tokenParts[0].trim();
-				String des = tokenParts[1].trim();
 				try {
 					token = AUTHORIZATION_BASIC_TOKEN + " "
-							+ Codec.stringToBase64(encryptionManager.decrypt(des));
+							+ Codec.stringToBase64(encryptionManager.decrypt(codec));
 				} catch (Exception e) {
 					logger.error(e.getMessage(), e);
 					throw new AuthenticationException(e.getMessage(), e);

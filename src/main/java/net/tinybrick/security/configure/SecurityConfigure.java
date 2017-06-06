@@ -48,6 +48,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -73,17 +74,11 @@ import com.octo.captcha.service.image.ImageCaptchaService;
 //@EnableConfigurationProperties({ PropertySourcesPlaceholderConfigurer.class })
 @PropertySource(value = "classpath:config/security.properties")
 public class SecurityConfigure {
-
 	/*@Bean
-	public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
-		return new PropertySourcesPlaceholderConfigurer();
-	}*/
-
-	@Bean
 	@Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
 	protected UserProperties userProperties() {
 		return new UserProperties();
-	}
+	}*/
 
 	@ConditionalOnMissingBean(SecurityProperties.class)
 	@Bean
@@ -308,15 +303,16 @@ public class SecurityConfigure {
 	public static class SecurityController {
 		final Logger logger = Logger.getLogger(this.getClass());
 
-		@Autowired UserProperties userProperties;
+		//@Autowired UserProperties userProperties;
 
 		@RequestMapping(value = "user", consumes = { MediaType.ALL_VALUE }, produces = {
 				MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 		public @ResponseBody ResponseEntity<Map<String, Object>> user(Principal principal) {
 			Map<String, Object> userInfoMap = new HashMap<String, Object>();
-			userInfoMap.put("username", userProperties.getCredential().getUsername());
-			userInfoMap.put("authority", userProperties.getAuthorities());
+			//userInfoMap.put("username", userProperties.getCredential().getUsername());
+			//userInfoMap.put("authority", userProperties.getAuthorities());
             userInfoMap.put("principal", principal);
+            userInfoMap.put("authority", SecurityContextHolder.getContext().getAuthentication().getAuthorities());
 
 			return new ResponseEntity<Map<String, Object>>(userInfoMap, HttpStatus.OK);
 		}
