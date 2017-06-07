@@ -2,6 +2,7 @@ package net.tinybrick.security.authentication;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -64,7 +65,15 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 		if (authentication.getClass() == UsernamePasswordAuthenticationToken.class) {
 			token = new UsernamePasswordToken();
 			try {
-				token.setUsername(URLDecoder.decode(authentication.getPrincipal().toString(), "UTF-8"));
+				String username = authentication.getPrincipal().toString();
+				String[] usernameParts = username.split("\\\\");
+				if(usernameParts.length > 1) {
+					token.setRealm(usernameParts[0]);
+					token.setUsername(URLDecoder.decode(usernameParts[1], "UTF-8"));
+				}
+				else{
+					token.setUsername(URLDecoder.decode(usernameParts[0], "UTF-8"));
+				}
 			}
 			catch (UnsupportedEncodingException e) {
 				logger.warn("UnsupportedEncodingException occurs!");

@@ -26,4 +26,14 @@ public class UsernamePasswordToken implements Serializable, IAuthenticationToken
 	public void setPassword(String password) {
 		this.password = password;
 	}
+
+	String realm = "DEFAULT";
+
+	public String getRealm() {
+		return realm;
+	}
+
+	public void setRealm(String realm) {
+		this.realm = realm;
+	}
 }

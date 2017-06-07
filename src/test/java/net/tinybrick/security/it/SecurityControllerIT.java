@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 
 import net.tinybrick.security.WebSecurityMainClass;
+import net.tinybrick.security.authentication.filter.tools.IEncryptionManager;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
@@ -25,7 +26,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import net.tinybrick.security.authentication.filter.EnhancedBasicAuthenticationFilter.IEncryptionManager;
 import net.tinybrick.test.web.it.IntegrationTestBase;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -64,7 +64,8 @@ public class SecurityControllerIT extends IntegrationTestBase {
 		}
 	}
 
-	@Autowired(required = false) IEncryptionManager encryptionManager;
+	@Autowired(required = false)
+	IEncryptionManager encryptionManager;
 
 	@Override
 	public String encrypt(String str) throws Exception {

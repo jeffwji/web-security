@@ -21,6 +21,8 @@ import net.tinybrick.security.authentication.UserProperties;
 import net.tinybrick.security.authentication.UsernamePasswordAuthenticationProvider;
 import net.tinybrick.security.authentication.filter.CaptchaAuthenticationFilter;
 import net.tinybrick.security.authentication.filter.EnhancedBasicAuthenticationFilter;
+import net.tinybrick.security.authentication.filter.tools.IEncryptionKeyManager;
+import net.tinybrick.security.authentication.filter.tools.IEncryptionManager;
 import net.tinybrick.security.authentication.filter.tools.RsaEncryptionKeyManager;
 import net.tinybrick.security.authentication.filter.tools.RsaEncryptionManager;
 import net.tinybrick.security.utils.captcha.ImageCaptchaEngine;
@@ -152,14 +154,13 @@ public class SecurityConfigure {
 			return captchaAuthenticationFilter;
 		}
 
-		//@Value("${authentication.filter.enhanced_basic.key:}") String encryptionKey;
+		//@Autowired(required = false)
+		static IEncryptionKeyManager encryptionKeyManager;
+
 		@Value("${authentication.filter.secure.public_key_file:}") String publicKeyFileName;
 		@Value("${authentication.filter.secure.private_key_file:}") String privateKeyFileName;
-		@Autowired(required = false)
-		EnhancedBasicAuthenticationFilter.IEncryptionKeyManager encryptionKeyManager;
-
 		@Bean
-		protected EnhancedBasicAuthenticationFilter.IEncryptionKeyManager encryptionKeyManager() throws IOException, DecoderException {
+		public IEncryptionKeyManager encryptionKeyManager() throws IOException, DecoderException {
 			if (null == encryptionKeyManager) {
                 if((null != publicKeyFileName && publicKeyFileName.trim().length() > 0)
                         && (null != privateKeyFileName && privateKeyFileName.trim().length() > 0)) {
@@ -177,11 +178,11 @@ public class SecurityConfigure {
 			return encryptionKeyManager;
 		}
 
-		@Autowired(required = false)
-		EnhancedBasicAuthenticationFilter.IEncryptionManager encryptionManager;
+		//@Autowired(required = false)
+		static IEncryptionManager encryptionManager;
 
 		@Bean
-		protected EnhancedBasicAuthenticationFilter.IEncryptionManager encryptionManager() throws Exception {
+		public IEncryptionManager encryptionManager() throws Exception {
 			if (null == encryptionManager) {
 				encryptionManager = new RsaEncryptionManager(encryptionKeyManager());
 			}

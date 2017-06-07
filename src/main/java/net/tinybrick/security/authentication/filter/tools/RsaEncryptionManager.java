@@ -8,11 +8,11 @@ import org.apache.log4j.Logger;
 /**
  * Created by ji.wang on 2017-05-11.
  */
-public class RsaEncryptionManager implements EnhancedBasicAuthenticationFilter.IEncryptionManager {
+public class RsaEncryptionManager implements IEncryptionManager {
     Logger logger = Logger.getLogger(this.getClass());
-    EnhancedBasicAuthenticationFilter.IEncryptionKeyManager keyManager = null;
+    IEncryptionKeyManager keyManager = null;
 
-    public RsaEncryptionManager(EnhancedBasicAuthenticationFilter.IEncryptionKeyManager keyManager) throws Exception {
+    public RsaEncryptionManager(IEncryptionKeyManager keyManager) throws Exception {
         this.keyManager = keyManager;
     }
 

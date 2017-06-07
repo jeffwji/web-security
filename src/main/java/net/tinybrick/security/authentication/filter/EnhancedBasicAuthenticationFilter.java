@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
+import net.tinybrick.security.authentication.filter.tools.IEncryptionManager;
 import net.tinybrick.utils.crypto.RSA;
 import net.tinybrick.utils.rest.IRestClient;
 import org.apache.http.auth.AuthenticationException;
@@ -119,15 +120,5 @@ public class EnhancedBasicAuthenticationFilter extends BasicAuthenticationFilter
 			}
 			return token;
 		}
-	}
-
-	public static interface IEncryptionKeyManager {
-		Object getEncryptKey();
-		Object getDecryptKey();
-	}
-
-	public static interface IEncryptionManager {
-		String encrypt(String str) throws Exception;
-		String decrypt(String str) throws Exception;
 	}
 }

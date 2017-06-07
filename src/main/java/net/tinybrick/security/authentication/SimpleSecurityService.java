@@ -17,7 +17,7 @@ public class SimpleSecurityService implements ISecurityService {
 	Logger logger = LoggerFactory.getLogger(getClass());
 
 	Properties properties = new Properties();
-	Map<String, Map<String, List<Authority<?, ?>>>> authMap = new HashMap<String, Map<String, List<Authority<?, ?>>>>();
+	protected Map<String, Map<String, List<Authority<?, ?>>>> authMap = new HashMap<String, Map<String, List<Authority<?, ?>>>>();
 
 	final static String PasswordAuthorityTokenizerSpliter = " ";
 	final static String AuthorityPermissionTokenizerSpliter = ":";
@@ -102,9 +102,11 @@ public class SimpleSecurityService implements ISecurityService {
 	@SuppressWarnings("serial")
 	protected Map<String, List<Authority<?, ?>>> auth(IAuthenticationToken<String> authentication) {
 		UsernamePasswordToken token = (UsernamePasswordToken) authentication;
-		Map<String, List<Authority<?, ?>>> auth = authMap.get(token.getUsername());
+		Map<String, List<Authority<?, ?>>> auth =
+				authMap.get((null == token.getRealm() || token.getRealm().toUpperCase().equals("DEFAULT"))?
+						token.getUsername():token.getRealm().toUpperCase()+"\\"+token.getUsername());
 		if (null == auth) {
-			throw new AuthenticationException("Invalid username or password " + token.getUsername()) {};
+			throw new AuthenticationException("Invalid username or password " + token.getUsername() + "in realm " + token.getRealm()) {};
 		}
 		return auth;
 	}

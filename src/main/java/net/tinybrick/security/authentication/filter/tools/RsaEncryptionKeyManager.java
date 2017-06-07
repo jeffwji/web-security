@@ -15,7 +15,7 @@ import java.security.NoSuchAlgorithmException;
 /**
  * Created by ji.wang on 2017-05-11.
  */
-public class RsaEncryptionKeyManager implements EnhancedBasicAuthenticationFilter.IEncryptionKeyManager{
+public class RsaEncryptionKeyManager implements IEncryptionKeyManager{
     Logger logger = Logger.getLogger(this.getClass());
     static int default_keyLength=1024;
 

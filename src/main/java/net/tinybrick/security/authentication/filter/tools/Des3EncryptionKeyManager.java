@@ -7,7 +7,7 @@ import java.util.UUID;
 /**
  * Created by ji.wang on 2017-05-11.
  */
-public class Des3EncryptionKeyManager implements EnhancedBasicAuthenticationFilter.IEncryptionKeyManager {
+public class Des3EncryptionKeyManager implements IEncryptionKeyManager {
     String key;
 
     public void setKey(String key) {
