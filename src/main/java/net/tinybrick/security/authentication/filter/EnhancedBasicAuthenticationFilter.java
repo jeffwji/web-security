@@ -92,7 +92,8 @@ public class EnhancedBasicAuthenticationFilter extends BasicAuthenticationFilter
 						header = decryptToken(header);
 					}
 				}
-				catch (AuthenticationException e) {
+				catch (Exception e) {
+					logger.error(e.getMessage(), e);
 					throw new RuntimeException(e);
 				}
 			}
