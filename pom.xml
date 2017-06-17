@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.wang</groupId>
+  <groupId>net.tinybrick</groupId>
   <artifactId>web-security</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>jar</packaging>
@@ -13,15 +13,15 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<junit.version>4.11</junit.version>
 		<spring.version>4.2.3.RELEASE</spring.version>
-		<spring.boot.version>1.3.0.RELEASE</spring.boot.version>
+        <spring.boot.version>1.3.8.RELEASE</spring.boot.version>
 		<utils.version>2.0.2-SNAPSHOT</utils.version>
 		<web-core.version>1.0.0-SNAPSHOT</web-core.version>
 		<test.version>1.0.0-SNAPSHOT</test.version>
 	</properties>
 	
 	<scm>
-	    <connection>scm:git:https://github.com/meee55/web-security.git</connection>
-	    <developerConnection>scm:git:https://github.com/meee55/web-security.git</developerConnection>
+	    <connection>scm:git:https://github.com/tinybrick/web-security.git</connection>
+	    <developerConnection>scm:git:https://github.com/tinybrick/web-security.git</developerConnection>
 	</scm>
 	
 	<!-- <repositories>
@@ -109,7 +109,7 @@
 		            <artifactId>spring-boot-maven-plugin</artifactId>
 		            <version>${spring.boot.version}</version>
 		            <configuration>
-		            	<layer>NONE</layer>
+		            	<layout>NONE</layout>
 		            	<skip>true</skip>
 		            </configuration>
 				      <executions>
@@ -126,8 +126,8 @@
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>3.0</version>
 					<configuration>
-						<source>1.7</source>
-						<target>1.7</target>
+						<source>1.8</source>
+						<target>1.8</target>
 					</configuration>
 				</plugin>
 
@@ -184,24 +184,32 @@
 				<filtering>false</filtering>
 				<directory>src/main/webapp</directory>
 			</resource>
+
 			<resource>
 				<filtering>true</filtering>
 				<directory>src/main/resources</directory>
 				<excludes>
 					<exclude>keystore</exclude>
+					<exclude>rsa_id</exclude>
+					<exclude>rsa_id.pub</exclude>
 				</excludes>
 			</resource>
+
 			<resource>
 				<filtering>false</filtering>
 				<directory>src/main/resources</directory>
 				<includes>
 					<include>keystore</include>
+					<include>rsa_id</include>
+					<include>rsa_id.pub</include>
 				</includes>
 			</resource>
+
 			<resource>
 				<filtering>true</filtering>
 				<directory>src/main/scripts</directory>
 			</resource>
+
 			<resource>
 				<filtering>false</filtering>
 				<targetPath>/webapp</targetPath>
@@ -216,72 +224,129 @@
 			<testResource>
 				<filtering>true</filtering>
 				<directory>src/test/resources</directory>
+				<excludes>
+					<exclude>keystore</exclude>
+					<exclude>rsa_id</exclude>
+					<exclude>rsa_id.pub</exclude>
+				</excludes>
+			</testResource>
+
+			<testResource>
+				<filtering>false</filtering>
+				<directory>src/test/resources</directory>
 				<includes>
-					<include>*</include>
+					<include>keystore</include>
+					<include>rsa_id</include>
+					<include>rsa_id.pub</include>
 				</includes>
 			</testResource>
 		</testResources>
 	</build>
 
+	<dependencyManagement>
+		<dependencies>
+			<!-- Test -->
+			<dependency>
+				<groupId>net.tinybrick</groupId>
+				<artifactId>test</artifactId>
+				<version>${test.version}</version>
+				<scope>test</scope>
+			</dependency>
+
+			<!-- HttpClient -->
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpcore</artifactId>
+				<version>4.4.1</version>
+			</dependency>
+
+			<!-- Spring boot -->
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-security</artifactId>
+				<version>${spring.boot.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-starter-logging</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+
+			<!-- htche-web -->
+			<dependency>
+				<groupId>net.tinybrick</groupId>
+				<artifactId>web-core</artifactId>
+				<version>${web-core.version}</version>
+				<scope>provided</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>net.tinybrick</groupId>
+				<artifactId>utils</artifactId>
+				<version>${utils.version}</version>
+			</dependency>
+
+			<!-- Captcha -->
+			<dependency>
+				<groupId>com.octo.captcha</groupId>
+				<artifactId>jcaptcha</artifactId>
+				<version>1.0</version>
+				<exclusions>
+					<exclusion>
+						<groupId>javax.servlet</groupId>
+						<artifactId>servlet-api</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+
+			<dependency>
+				<groupId>com.jhlabs</groupId>
+				<artifactId>imaging</artifactId>
+				<version>01012005</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<dependencies>
 		<!-- Test -->
 		<dependency>
-			<groupId>com.wang</groupId>
+			<groupId>net.tinybrick</groupId>
 			<artifactId>test</artifactId>
-			<version>${test.version}</version>
-			<scope>test</scope>
 		</dependency>
 
 		<!-- HttpClient -->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpcore</artifactId>
-			<version>4.4.1</version>
 		</dependency>
 
 		<!-- Spring boot -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
-			<version>${spring.boot.version}</version>
-			<exclusions>
-	            <exclusion>
-	                <groupId>org.springframework.boot</groupId>
-	                <artifactId>spring-boot-starter-logging</artifactId>
-	            </exclusion>
-	        </exclusions>
 		</dependency>
 
 		<!-- htche-web -->
 		<dependency>
-		    <groupId>com.wang</groupId>
+		    <groupId>net.tinybrick</groupId>
 		    <artifactId>web-core</artifactId>
-		    <version>${web-core.version}</version>
-		    <scope>provided</scope>
 		</dependency>
 		
 		<dependency>
-		    <groupId>com.wang</groupId>
+		    <groupId>net.tinybrick</groupId>
 		    <artifactId>utils</artifactId>
-		    <version>${utils.version}</version>
 		</dependency>
 		
 		<!-- Captcha -->
 		<dependency>
 			<groupId>com.octo.captcha</groupId>
 			<artifactId>jcaptcha</artifactId>
-			<version>1.0</version>
-			<exclusions>
-				<exclusion>
-					<groupId>javax.servlet</groupId>
-					<artifactId>servlet-api</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
-		<dependency>
-			<groupId>com.jhlabs</groupId>
-			<artifactId>imaging</artifactId>
-			<version>01012005</version>
-		</dependency>
-  </dependencies>
+
+        <dependency>
+            <groupId>com.jhlabs</groupId>
+            <artifactId>imaging</artifactId>
+        </dependency>
+    </dependencies>
 </project>
