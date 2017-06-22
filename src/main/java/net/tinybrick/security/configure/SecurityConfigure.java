@@ -26,6 +26,7 @@ import net.tinybrick.security.authentication.filter.tools.IEncryptionManager;
 import net.tinybrick.security.authentication.filter.tools.RsaEncryptionKeyManager;
 import net.tinybrick.security.authentication.filter.tools.RsaEncryptionManager;
 import net.tinybrick.security.utils.captcha.ImageCaptchaEngine;
+import net.tinybrick.web.configure.WebResources;
 import org.apache.commons.codec.DecoderException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -200,18 +201,27 @@ public class SecurityConfigure {
 			return enhancedBasicAuthenticationFilter;
 		}
 
+		@Autowired
+		WebResources webResources;
+
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
 			http.csrf().disable().formLogin().loginPage(loginUrl).failureUrl(loginUrl + "?error").permitAll()
 					.and().logout().deleteCookies("JSESSIONID")
 					.logoutRequestMatcher(new AntPathRequestMatcher(logoutUrl)).logoutSuccessUrl(loginUrl)
 					.and().authorizeRequests().antMatchers(loginUrl+"/**").permitAll()
-					.and().authorizeRequests().antMatchers("/captcha/**").permitAll()
-					.and().authorizeRequests().antMatchers("/images/**").permitAll()
-					.and().authorizeRequests().antMatchers("/css/**").permitAll()
-					.and().authorizeRequests().antMatchers("/js/**").permitAll()
-					.and().authorizeRequests().antMatchers("/static/**").permitAll()
-					.and().authorizeRequests().antMatchers("/public/**").permitAll();
+					.and().authorizeRequests().antMatchers("/captcha/**").permitAll();
+
+					if(null != webResources) {
+						String[] staticResources = webResources.getStaticResources();
+						for(String staticResource : staticResources) {
+							http.authorizeRequests().antMatchers(staticResource + "**").permitAll()/*
+									.and().authorizeRequests().antMatchers("/css*//**").permitAll()
+									.and().authorizeRequests().antMatchers("/js*//**").permitAll()
+									.and().authorizeRequests().antMatchers("/static*//**").permitAll()
+									.and().authorizeRequests().antMatchers("/public*//**").permitAll()*/;
+						}
+					}
 
 			if (null != httpSecurityConfigure) {
 				logger.info("Apply customized security configure.");
@@ -306,7 +316,7 @@ public class SecurityConfigure {
 
 		//@Autowired UserProperties userProperties;
 
-		@RequestMapping(value = "user", consumes = { MediaType.ALL_VALUE }, produces = {
+		@RequestMapping(value = "/user", consumes = { MediaType.ALL_VALUE }, produces = {
 				MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 		public @ResponseBody ResponseEntity<Map<String, Object>> user(Principal principal) {
 			Map<String, Object> userInfoMap = new HashMap<String, Object>();
