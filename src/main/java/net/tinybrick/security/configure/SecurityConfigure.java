@@ -201,6 +201,7 @@ public class SecurityConfigure {
 			return enhancedBasicAuthenticationFilter;
 		}
 
+		@Value("${web.insecure.paths:}") String[] insecureResources;
 		@Autowired
 		WebResources webResources;
 
@@ -209,19 +210,23 @@ public class SecurityConfigure {
 			http.csrf().disable().formLogin().loginPage(loginUrl).failureUrl(loginUrl + "?error").permitAll()
 					.and().logout().deleteCookies("JSESSIONID")
 					.logoutRequestMatcher(new AntPathRequestMatcher(logoutUrl)).logoutSuccessUrl(loginUrl)
-					.and().authorizeRequests().antMatchers(loginUrl+"/**").permitAll()
-					.and().authorizeRequests().antMatchers("/captcha/**").permitAll();
+                    .and().authorizeRequests().antMatchers(loginUrl+"/**").permitAll()
+					.and().authorizeRequests().antMatchers("/captcha/**").permitAll()/*
+                    .and().authorizeRequests().antMatchers("/images*//**").permitAll()
+                    .and().authorizeRequests().antMatchers("/css*//**").permitAll()
+                    .and().authorizeRequests().antMatchers("/js*//**").permitAll()
+                    .and().authorizeRequests().antMatchers("/static*//**").permitAll()
+                    .and().authorizeRequests().antMatchers("/public*//**").permitAll()*/;
 
-					if(null != webResources) {
-						String[] staticResources = webResources.getStaticResources();
-						for(String staticResource : staticResources) {
-							http.authorizeRequests().antMatchers(staticResource + "**").permitAll()/*
-									.and().authorizeRequests().antMatchers("/css*//**").permitAll()
-									.and().authorizeRequests().antMatchers("/js*//**").permitAll()
-									.and().authorizeRequests().antMatchers("/static*//**").permitAll()
-									.and().authorizeRequests().antMatchers("/public*//**").permitAll()*/;
-						}
-					}
+			if(0 == insecureResources.length) {
+				if (null != webResources) {
+					insecureResources = webResources.getStaticResources();
+				}
+			}
+
+			for (String insecureResource : insecureResources) {
+				http.authorizeRequests().antMatchers(insecureResource + "/**").permitAll();
+			}
 
 			if (null != httpSecurityConfigure) {
 				logger.info("Apply customized security configure.");
@@ -310,13 +315,12 @@ public class SecurityConfigure {
 	}
 
 	@RestController
-	@RequestMapping("/rest/v1")
 	public static class SecurityController {
 		final Logger logger = Logger.getLogger(this.getClass());
 
 		//@Autowired UserProperties userProperties;
 
-		@RequestMapping(value = "/user", consumes = { MediaType.ALL_VALUE }, produces = {
+		@RequestMapping(value = "/rest/v1/user", consumes = { MediaType.ALL_VALUE }, produces = {
 				MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 		public @ResponseBody ResponseEntity<Map<String, Object>> user(Principal principal) {
 			Map<String, Object> userInfoMap = new HashMap<String, Object>();

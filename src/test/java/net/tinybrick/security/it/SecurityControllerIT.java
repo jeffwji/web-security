@@ -99,9 +99,10 @@ public class SecurityControllerIT extends IntegrationTestBase {
 
 		//To prevent username and password to be enclosed into basic authentication field, we temporally disable them. 
 		userName = password = null;
-		ResponseEntity<String> entity = post("http://localhost:" + this.port + "/login", form, String.class, true);
+		ResponseEntity<String> entity = post("http://localhost:" + this.port + "/login", form, String.class, false);
 
-		Assert.assertEquals(HttpStatus.NOT_FOUND, entity.getStatusCode());
+		Assert.assertEquals(HttpStatus.valueOf(302), entity.getStatusCode());
+		Assert.assertEquals("http://localhost:" + this.port + "/", entity.getHeaders().getLocation().toString());
 	}
 
 	@Test
