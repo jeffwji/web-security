@@ -1,10 +1,8 @@
 package net.tinybrick.security.it;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-
 import net.tinybrick.security.WebSecurityMainClass;
 import net.tinybrick.security.authentication.filter.tools.IEncryptionManager;
+import net.tinybrick.test.web.it.IntegrationTestBase;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
@@ -13,12 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -26,7 +19,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import net.tinybrick.test.web.it.IntegrationTestBase;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = WebSecurityMainClass.class)

@@ -5,10 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.Principal;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletOutputStream;
@@ -219,8 +216,12 @@ public class SecurityConfigure {
                     .and().authorizeRequests().antMatchers("/public*//**").permitAll()*/;
 
 			if(0 == insecureResources.length) {
-				if (null != webResources) {
-					insecureResources = webResources.getStaticResources();
+				if (null != webResources ) {
+					Collection staticResources = webResources.getStaticResources().values();
+					if (staticResources.size() > 0) {
+						insecureResources = new String[staticResources.size()];
+						webResources.getStaticResources().values().toArray(insecureResources);
+					}
 				}
 			}
 
