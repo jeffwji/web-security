@@ -327,12 +327,14 @@ public class SecurityConfigure {
             String encryptedString = null;
             try {
                 if(null != encryptionManager){
-                    encryptedString= "Bearer " + encryptionManager.encrypt(username+":"+password);
+                    encryptedString= encryptionManager.encrypt(username+":"+password);
+					userInfoMap.put("type", "Bearer");
                 }
                 else{
-                    encryptedString= "Basic " + Codec.stringToBase64(username + ":" + password);
+                    encryptedString= Codec.stringToBase64(username + ":" + password);
+					userInfoMap.put("type", "Basic");
                 }
-                userInfoMap.put("token", encryptedString);
+				userInfoMap.put("token", encryptedString);
             } catch (Exception e) {
                 userInfoMap.put("error", e.getMessage());
                 return new ResponseEntity<Map<String, Object>>(userInfoMap, HttpStatus.UNAUTHORIZED);
