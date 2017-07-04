@@ -71,10 +71,10 @@ public class LoginControllerTest extends ControllerTestBase {
 		resultActions.andDo(print()).andExpect(status().isOk());
 
 		JSONObject tokenJson = new JSONObject(resultActions.andReturn().getResponse().getContentAsString());
-		String token = tokenJson.getString("token");
+		String token = tokenJson.getString("token").split(" ")[1];
 
 		if(null != encryptionManager){
-			Assert.assertEquals(getUsername()+":"+getPassword(),encryptionManager.decrypt(token));
+			Assert.assertEquals(getUsername()+":"+getPassword(), encryptionManager.decrypt(token));
 		}
 		else {
 			Assert.assertEquals(getUsername()+":"+getPassword(), Codec.stringFromBas64(token));

@@ -116,7 +116,7 @@ public class EnhancedBasicAuthenticationFilter extends BasicAuthenticationFilter
 				}
 			}
 			else {
-				logger.warn("No decryption key is found!");
+				token = AUTHORIZATION_BASIC_TOKEN + " " + codec;
 			}
 			return token;
 		}

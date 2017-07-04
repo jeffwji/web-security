@@ -327,10 +327,10 @@ public class SecurityConfigure {
             String encryptedString = null;
             try {
                 if(null != encryptionManager){
-                    encryptedString= encryptionManager.encrypt(username+":"+password);
+                    encryptedString= "Bearer " + encryptionManager.encrypt(username+":"+password);
                 }
                 else{
-                    encryptedString= Codec.stringToBase64(username + ":" + password);
+                    encryptedString= "Basic " + Codec.stringToBase64(username + ":" + password);
                 }
                 userInfoMap.put("token", encryptedString);
             } catch (Exception e) {
