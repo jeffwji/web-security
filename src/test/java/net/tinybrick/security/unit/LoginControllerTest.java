@@ -4,7 +4,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import net.tinybrick.security.authentication.UsernamePasswordToken;
+import net.tinybrick.security.authentication.filter.tools.IEncryptionManager;
+import net.tinybrick.utils.crypto.Codec;
+import org.json.JSONObject;
+import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,6 +31,8 @@ import java.util.List;
 public class LoginControllerTest extends ControllerTestBase {
 	//@Autowired
 	//UserProperties userProperties;
+	@Autowired(required = false)
+	IEncryptionManager encryptionManager;
 
 	Collection<? extends GrantedAuthority>  getAuthorities() {
         List<GrantedAuthority> list = new ArrayList<GrantedAuthority>();
@@ -56,5 +63,21 @@ public class LoginControllerTest extends ControllerTestBase {
 
 		resultActions = GET("/rest/v1/user", MediaType.APPLICATION_JSON, MediaType.APPLICATION_JSON);
 		resultActions.andDo(print()).andExpect(status().isOk());
+	}
+
+	@Test
+	public void testGetLoginToken() throws Exception {
+		ResultActions resultActions = GET("/login/token/"+getUsername()+"/"+getPassword(), MediaType.APPLICATION_JSON, MediaType.APPLICATION_JSON);
+		resultActions.andDo(print()).andExpect(status().isOk());
+
+		JSONObject tokenJson = new JSONObject(resultActions.andReturn().getResponse().getContentAsString());
+		String token = tokenJson.getString("token");
+
+		if(null != encryptionManager){
+			Assert.assertEquals(getUsername()+":"+getPassword(),encryptionManager.decrypt(token));
+		}
+		else {
+			Assert.assertEquals(getUsername()+":"+getPassword(), Codec.stringFromBas64(token));
+		}
 	}
 }

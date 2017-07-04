@@ -1,21 +1,9 @@
 package net.tinybrick.security.configure;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.Principal;
-import java.util.*;
-
-import javax.imageio.ImageIO;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import net.tinybrick.security.authentication.AuthenticationService;
-import net.tinybrick.security.authentication.IHttpSecurityConfigure;
-import net.tinybrick.security.authentication.UserProperties;
-import net.tinybrick.security.authentication.UsernamePasswordAuthenticationProvider;
+import com.octo.captcha.service.CaptchaServiceException;
+import com.octo.captcha.service.image.DefaultManageableImageCaptchaService;
+import com.octo.captcha.service.image.ImageCaptchaService;
+import net.tinybrick.security.authentication.*;
 import net.tinybrick.security.authentication.filter.CaptchaAuthenticationFilter;
 import net.tinybrick.security.authentication.filter.EnhancedBasicAuthenticationFilter;
 import net.tinybrick.security.authentication.filter.tools.IEncryptionKeyManager;
@@ -23,6 +11,7 @@ import net.tinybrick.security.authentication.filter.tools.IEncryptionManager;
 import net.tinybrick.security.authentication.filter.tools.RsaEncryptionKeyManager;
 import net.tinybrick.security.authentication.filter.tools.RsaEncryptionManager;
 import net.tinybrick.security.utils.captcha.ImageCaptchaEngine;
+import net.tinybrick.utils.crypto.Codec;
 import net.tinybrick.web.configure.WebResources;
 import org.apache.commons.codec.DecoderException;
 import org.apache.log4j.Logger;
@@ -31,12 +20,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.boot.autoconfigure.test.ImportAutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -54,18 +42,23 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-import com.octo.captcha.service.CaptchaServiceException;
-import com.octo.captcha.service.image.DefaultManageableImageCaptchaService;
-import com.octo.captcha.service.image.ImageCaptchaService;
+import javax.imageio.ImageIO;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.Principal;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @EnableGlobalMethodSecurity
 @EnableWebSecurity
@@ -318,8 +311,35 @@ public class SecurityConfigure {
 	@RestController
 	public static class SecurityController {
 		final Logger logger = Logger.getLogger(this.getClass());
+		@Autowired
+        IAuthenticationService authenticationService;
+		@Autowired(required = false) IEncryptionManager encryptionManager;
 
-		//@Autowired UserProperties userProperties;
+        @RequestMapping(value = "/login/token/{username}/{password}", consumes = { MediaType.ALL_VALUE }, produces = {
+                MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+        public @ResponseBody ResponseEntity<Map<String, Object>> tokenLogin(@PathVariable String username,@PathVariable String password) {
+            Map<String, Object> userInfoMap = new HashMap<String, Object>();
+            UsernamePasswordToken token =new UsernamePasswordToken();
+            token.setUsername(username);
+            token.setPassword(password);
+
+            authenticationService.authentication(token);
+            String encryptedString = null;
+            try {
+                if(null != encryptionManager){
+                    encryptedString= encryptionManager.encrypt(username+":"+password);
+                }
+                else{
+                    encryptedString= Codec.stringToBase64(username + ":" + password);
+                }
+                userInfoMap.put("token", encryptedString);
+            } catch (Exception e) {
+                userInfoMap.put("error", e.getMessage());
+                return new ResponseEntity<Map<String, Object>>(userInfoMap, HttpStatus.UNAUTHORIZED);
+            }
+
+            return new ResponseEntity<Map<String, Object>>(userInfoMap, HttpStatus.OK);
+        }
 
 		@RequestMapping(value = "/rest/v1/user", consumes = { MediaType.ALL_VALUE }, produces = {
 				MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
