@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
-import org.springframework.boot.autoconfigure.test.ImportAutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -146,13 +145,15 @@ public class SecurityConfigure {
 		}
 
 		//@Autowired(required = false)
-		static IEncryptionKeyManager encryptionKeyManager;
+		//static IEncryptionKeyManager encryptionKeyManager;
 
 		@Value("${authentication.filter.secure.public_key_file:}") String publicKeyFileName;
 		@Value("${authentication.filter.secure.private_key_file:}") String privateKeyFileName;
 		@Bean
 		public IEncryptionKeyManager encryptionKeyManager() throws IOException, DecoderException {
-			if (null == encryptionKeyManager) {
+			IEncryptionKeyManager encryptionKeyManager;
+
+			//if (null == encryptionKeyManager) {
                 if((null != publicKeyFileName && publicKeyFileName.trim().length() > 0)
                         && (null != privateKeyFileName && privateKeyFileName.trim().length() > 0)) {
                     InputStream publicKeyInput =  appContext.getResource(publicKeyFileName).getInputStream();
@@ -164,19 +165,19 @@ public class SecurityConfigure {
                     encryptionKeyManager = new RsaEncryptionKeyManager();
                 }
                 logger.info("No EncryptionKeyManager instance has been found. a default one has been created.");
-			}
+			//}
 
 			return encryptionKeyManager;
 		}
 
 		//@Autowired(required = false)
-		static IEncryptionManager encryptionManager;
+		//static IEncryptionManager encryptionManager;
 
 		@Bean
 		public IEncryptionManager encryptionManager() throws Exception {
-			if (null == encryptionManager) {
-				encryptionManager = new RsaEncryptionManager(encryptionKeyManager());
-			}
+			//if (null == encryptionManager) {
+			IEncryptionManager encryptionManager = new RsaEncryptionManager(encryptionKeyManager());
+			//}
 
 			return encryptionManager;
 		}
