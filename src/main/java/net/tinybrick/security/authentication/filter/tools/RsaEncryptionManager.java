@@ -1,6 +1,5 @@
 package net.tinybrick.security.authentication.filter.tools;
 
-import net.tinybrick.security.authentication.filter.EnhancedBasicAuthenticationFilter;
 import net.tinybrick.utils.crypto.Codec;
 import net.tinybrick.utils.crypto.RSA;
 import org.apache.log4j.Logger;

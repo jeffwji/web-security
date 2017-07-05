@@ -1,11 +1,11 @@
 package net.tinybrick.security.unit;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import net.tinybrick.security.authentication.UsernamePasswordToken;
 import net.tinybrick.security.authentication.filter.tools.IEncryptionManager;
+import net.tinybrick.security.configure.SecurityConfigure;
+import net.tinybrick.test.web.unit.ControllerTestBase;
 import net.tinybrick.utils.crypto.Codec;
+import net.tinybrick.web.configure.ApplicationCoreConfigure;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
@@ -18,13 +18,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.ResultActions;
 
-import net.tinybrick.security.configure.SecurityConfigure;
-import net.tinybrick.web.configure.ApplicationCoreConfigure;
-import net.tinybrick.test.web.unit.ControllerTestBase;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringApplicationConfiguration(classes = { SecurityConfigure.class, ApplicationCoreConfigure.class })
 @TestPropertySource(locations = "classpath:config/security.properties")

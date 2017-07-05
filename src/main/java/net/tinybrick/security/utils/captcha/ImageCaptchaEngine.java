@@ -1,12 +1,5 @@
 package net.tinybrick.security.utils.captcha;
 
-import java.awt.Color;
-import java.awt.image.BufferedImage;
-import java.io.Serializable;
-import java.security.SecureRandom;
-import java.util.Locale;
-import java.util.Random;
-
 import com.octo.captcha.CaptchaException;
 import com.octo.captcha.CaptchaQuestionHelper;
 import com.octo.captcha.component.image.backgroundgenerator.BackgroundGenerator;
@@ -23,6 +16,13 @@ import com.octo.captcha.engine.image.ListImageCaptchaEngine;
 import com.octo.captcha.image.ImageCaptcha;
 import com.octo.captcha.image.gimpy.Gimpy;
 import com.octo.captcha.image.gimpy.GimpyFactory;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.Serializable;
+import java.security.SecureRandom;
+import java.util.Locale;
+import java.util.Random;
 
 public class ImageCaptchaEngine extends ListImageCaptchaEngine {
 	public static String randomWords = "ABDEFGHJKLMNPQRTYabdefghijkmnpqrtuy23456789";

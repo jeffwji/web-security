@@ -1,11 +1,10 @@
 package net.tinybrick.security.authentication;
 
-import java.io.Serializable;
-import java.util.List;
+import org.apache.log4j.Logger;
 
 import javax.xml.bind.annotation.XmlElement;
-
-import org.apache.log4j.Logger;
+import java.io.Serializable;
+import java.util.List;
 
 //@Component("userPreferences")
 //@Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)

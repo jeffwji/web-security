@@ -1,17 +1,11 @@
 package net.tinybrick.security.authentication;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.StringTokenizer;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.AuthenticationException;
+
+import java.io.InputStream;
+import java.util.*;
 
 public class SimpleSecurityService implements ISecurityService {
 	Logger logger = LoggerFactory.getLogger(getClass());

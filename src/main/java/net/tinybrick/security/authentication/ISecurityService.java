@@ -1,8 +1,8 @@
 package net.tinybrick.security.authentication;
 
-import java.util.List;
-
 import org.springframework.security.core.AuthenticationException;
+
+import java.util.List;
 
 public interface ISecurityService {
 	void validate(IAuthenticationToken<?> authentication) throws AuthenticationException;

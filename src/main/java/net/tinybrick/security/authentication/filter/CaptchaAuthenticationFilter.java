@@ -1,15 +1,14 @@
 package net.tinybrick.security.authentication.filter;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.octo.captcha.service.image.ImageCaptchaService;
+import net.tinybrick.security.exception.InvalidCaptacheException;
+import net.tinybrick.utils.i18n.I18N;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import net.tinybrick.security.exception.InvalidCaptacheException;
-import net.tinybrick.utils.i18n.I18N;
-import com.octo.captcha.service.image.ImageCaptchaService;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class CaptchaAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 	public static final String SPRING_SECURITY_FORM_CAPTCHA_KEY = "captcha";

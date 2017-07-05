@@ -1,23 +1,19 @@
 package net.tinybrick.security.authentication.filter;
 
-import java.io.IOException;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpServletResponse;
-
 import net.tinybrick.security.authentication.filter.tools.IEncryptionManager;
-import net.tinybrick.utils.crypto.RSA;
+import net.tinybrick.utils.crypto.Codec;
 import net.tinybrick.utils.rest.IRestClient;
 import org.apache.http.auth.AuthenticationException;
 import org.apache.log4j.Logger;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
-import net.tinybrick.utils.crypto.Codec;
-import net.tinybrick.utils.crypto.DES3;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 public class EnhancedBasicAuthenticationFilter extends BasicAuthenticationFilter {
 	Logger logger = Logger.getLogger(this.getClass());

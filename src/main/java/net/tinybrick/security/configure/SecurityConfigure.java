@@ -66,12 +66,6 @@ import java.util.Map;
 //@EnableConfigurationProperties({ PropertySourcesPlaceholderConfigurer.class })
 @PropertySource(value = "classpath:config/security.properties")
 public class SecurityConfigure {
-	/*@Bean
-	@Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
-	protected UserProperties userProperties() {
-		return new UserProperties();
-	}*/
-
 	@ConditionalOnMissingBean(SecurityProperties.class)
 	@Bean
 	protected SecurityProperties SecurityProperties() {
@@ -144,9 +138,6 @@ public class SecurityConfigure {
 			return captchaAuthenticationFilter;
 		}
 
-		//@Autowired(required = false)
-		//static IEncryptionKeyManager encryptionKeyManager;
-
 		@Value("${authentication.filter.secure.public_key_file:}") String publicKeyFileName;
 		@Value("${authentication.filter.secure.private_key_file:}") String privateKeyFileName;
 		@Bean
@@ -169,9 +160,6 @@ public class SecurityConfigure {
 
 			return encryptionKeyManager;
 		}
-
-		//@Autowired(required = false)
-		//static IEncryptionManager encryptionManager;
 
 		@Bean
 		public IEncryptionManager encryptionManager() throws Exception {

@@ -1,7 +1,5 @@
 package net.tinybrick.security.authentication.filter.tools;
 
-import net.tinybrick.security.authentication.filter.EnhancedBasicAuthenticationFilter;
-
 import java.util.UUID;
 
 /**

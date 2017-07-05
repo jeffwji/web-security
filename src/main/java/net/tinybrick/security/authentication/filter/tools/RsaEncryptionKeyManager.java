@@ -1,12 +1,14 @@
 package net.tinybrick.security.authentication.filter.tools;
 
-import net.tinybrick.security.authentication.filter.EnhancedBasicAuthenticationFilter;
 import net.tinybrick.utils.crypto.Codec;
 import net.tinybrick.utils.crypto.RSA;
 import org.apache.commons.codec.DecoderException;
 import org.apache.log4j.Logger;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;

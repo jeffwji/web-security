@@ -1,13 +1,12 @@
 package net.tinybrick.security;
 
+import net.tinybrick.web.configure.ApplicationCoreConfigure;
 import org.apache.log4j.Logger;
 import org.springframework.boot.Banner.Mode;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
-
-import net.tinybrick.web.configure.ApplicationCoreConfigure;
 
 /**
  * Hello world!
