@@ -41,7 +41,7 @@ public class SecurityControllerIT extends IntegrationTestBase {
 		return userName;
 	}
 
-	String password = "user";
+	String password = "pa55w0rd";
 
 	@Override
 	public String getPassword() {

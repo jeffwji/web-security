@@ -30,7 +30,7 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-		UsernamePasswordToken token = (UsernamePasswordToken) getAuthenticationToken(authentication);
+		UsernamePasswordAuthenticationToken token = getAuthenticationToken(authentication);
 
 		try {
 			authenticationService.authentication(token);
@@ -56,22 +56,28 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 		 */
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
-		return new UsernamePasswordAuthenticationToken(token.getUsername(), token.getPassword(), grantedAuthorities);
+		return new UsernamePasswordAuthenticationToken(token.getPrincipal(), token.getCredentials(), grantedAuthorities);
 	}
 
-	public IAuthenticationToken getAuthenticationToken(Authentication authentication) {
-		UsernamePasswordToken token = null;
+
+	public UsernamePasswordAuthenticationToken getAuthenticationToken(Authentication authentication) {
+		Principal principal = new Principal();
+		String realme = null;
+		String username = null;
+
 		if (authentication.getClass() == UsernamePasswordAuthenticationToken.class) {
-			token = new UsernamePasswordToken();
 			try {
-				String username = authentication.getPrincipal().toString();
-				String[] usernameParts = username.split("\\\\");
+				String authenticationString = authentication.getPrincipal().toString();
+				String[] usernameParts = authenticationString.split("\\\\");
 				if(usernameParts.length > 1) {
-					token.setRealm(usernameParts[0]);
-					token.setUsername(URLDecoder.decode(usernameParts[1], "UTF-8"));
+					realme = usernameParts[0];
+					username = URLDecoder.decode(usernameParts[1], "UTF-8");
+					principal.setUsername(username);
+					principal.setRealm(realme);
 				}
 				else{
-					token.setUsername(URLDecoder.decode(usernameParts[0], "UTF-8"));
+					username = URLDecoder.decode(usernameParts[0], "UTF-8");
+					principal.setUsername(username);
 				}
 			}
 			catch (UnsupportedEncodingException e) {
@@ -80,15 +86,9 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 					private static final long serialVersionUID = 6781730518784884442L;
 				};
 			}
-			token.setPassword((String) authentication.getCredentials());
 		}
-		validate(token);
 
-		return token;
-	}
-
-	private void validate(UsernamePasswordToken token) {
-		//TODO:
+		return new UsernamePasswordAuthenticationToken(principal, authentication.getCredentials());
 	}
 
 	@Override

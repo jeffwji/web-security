@@ -2,6 +2,7 @@ package net.tinybrick.security.authentication;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 
 import java.io.InputStream;
@@ -78,24 +79,35 @@ public class SimpleSecurityService implements ISecurityService {
 
 	@SuppressWarnings("serial")
 	@Override
-	public void validate(IAuthenticationToken<?> authentication) throws AuthenticationException {
-		UsernamePasswordToken token = (UsernamePasswordToken) authentication;
-		Map<String, List<Authority<?, ?>>> auth = auth(token);
-		if (!auth.keySet().contains(token.getPassword())) {
-			throw new AuthenticationException("Invalid username or password " + token.getUsername()) {};
+	public void validate(UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
+		Map<String, List<Authority<?, ?>>> auth = auth(authentication);
+		if (!auth.keySet().contains(authentication.getCredentials())) {
+			throw new AuthenticationException("Invalid username or password " + ((Principal)authentication.getPrincipal()).getUsername()) {};
 		}
 	}
 
 	@Override
-	public List<Authority<?, ?>> getAuthorities(IAuthenticationToken<?> authentication) {
-		UsernamePasswordToken token = (UsernamePasswordToken) authentication;
-		Map<String, List<Authority<?, ?>>> auth = auth(token);
-		return auth.get(token.getPassword());
+	public List<Authority<?, ?>> getAuthorities(Principal principal) {
+		List<Authority<?, ?>> authorities = new ArrayList<Authority<?, ?>>();
+		String username = (null == principal.getRealm() || principal.getRealm().toUpperCase().equals("DEFAULT"))?
+				principal.getUsername():principal.getRealm().toUpperCase()+"\\"+principal.getUsername();
+
+		Map<String, List<Authority<?, ?>>> authorityMap = authMap.get(username);
+		if(null != authorityMap){
+			Collection authorityCollection = authorityMap.values();
+			Iterator authorityIterator = authorityCollection.iterator();
+			while(authorityIterator.hasNext()){
+				authorities.addAll((List<Authority<?, ?>>)authorityIterator.next());
+			}
+		}
+
+		return authorities;
 	}
 
 	@SuppressWarnings("serial")
-	protected Map<String, List<Authority<?, ?>>> auth(IAuthenticationToken<String> authentication) {
-		UsernamePasswordToken token = (UsernamePasswordToken) authentication;
+	protected Map<String, List<Authority<?, ?>>> auth(UsernamePasswordAuthenticationToken authentication) {
+		Principal token = (Principal) authentication.getPrincipal();
+
 		Map<String, List<Authority<?, ?>>> auth =
 				authMap.get((null == token.getRealm() || token.getRealm().toUpperCase().equals("DEFAULT"))?
 						token.getUsername():token.getRealm().toUpperCase()+"\\"+token.getUsername());

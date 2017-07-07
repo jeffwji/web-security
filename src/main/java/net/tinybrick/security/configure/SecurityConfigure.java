@@ -30,6 +30,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -53,7 +54,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.Principal;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -308,9 +310,27 @@ public class SecurityConfigure {
                 MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
         public @ResponseBody ResponseEntity<Map<String, Object>> tokenLogin(@PathVariable String username,@PathVariable String password) {
             Map<String, Object> userInfoMap = new HashMap<String, Object>();
-            UsernamePasswordToken token =new UsernamePasswordToken();
-            token.setUsername(username);
-            token.setPassword(password);
+			try {
+				username = URLDecoder.decode(username, "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				logger.warn(e.getMessage(), e);
+			}
+			try {
+				password = URLDecoder.decode(password, "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				logger.warn(e.getMessage(), e);
+			}
+
+			String[] usernameParts = username.split("\\\\");
+			Principal principal = null;
+			if (usernameParts.length > 1)
+				principal = new Principal(usernameParts[0], usernameParts[1]);
+			else
+				principal = new Principal(username);
+
+			UsernamePasswordAuthenticationToken token =new UsernamePasswordAuthenticationToken(principal, password);
+            //token.setUsername(username);
+            //token.setPassword(password);
 
             authenticationService.authentication(token);
             String encryptedString = null;

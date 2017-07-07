@@ -1,6 +1,5 @@
 package net.tinybrick.security.unit;
 
-import net.tinybrick.security.authentication.UsernamePasswordToken;
 import net.tinybrick.security.authentication.filter.tools.IEncryptionManager;
 import net.tinybrick.security.configure.SecurityConfigure;
 import net.tinybrick.test.web.unit.ControllerTestBase;
@@ -47,8 +46,8 @@ public class LoginControllerTest extends ControllerTestBase {
 
 	@Test
 	public void TestGetLoginUserInformation() throws Exception {
-		UsernamePasswordToken token = new UsernamePasswordToken();
-		token.setUsername("User");
+		//UsernamePasswordToken token = new UsernamePasswordToken("User", null);
+		//token.setUsername("User");
 		//userProperties.setCredential(token);
 
 		ResultActions resultActions;
