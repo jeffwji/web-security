@@ -107,7 +107,7 @@ public class SecurityControllerIT extends IntegrationTestBase {
 				LinkedHashMap.class, false);
 
 		Assert.assertEquals(HttpStatus.OK, entity.getStatusCode());
-		Assert.assertTrue(entity.getBody().containsKey("authority"));
+		Assert.assertTrue(entity.getBody().containsKey("authentication"));
 	}
 
 	@Test
@@ -119,6 +119,6 @@ public class SecurityControllerIT extends IntegrationTestBase {
 				LinkedHashMap.class, false);
 
 		Assert.assertEquals(HttpStatus.OK, entity.getStatusCode());
-		Assert.assertTrue(entity.getBody().containsKey("authority"));
+		Assert.assertTrue(entity.getBody().containsKey("authentication"));
 	}
 }

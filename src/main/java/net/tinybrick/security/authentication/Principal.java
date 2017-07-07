@@ -4,8 +4,8 @@ package net.tinybrick.security.authentication;
  * Created by ji.wang on 2017-07-06.
  */
 public class Principal implements IAuthenticationToken<String>{
-    String username;
-    String realm = "DEFAULT";
+    String username = null;
+    String realm = null;
 
     public Principal() {}
     public Principal(String username) {this(username, null);}

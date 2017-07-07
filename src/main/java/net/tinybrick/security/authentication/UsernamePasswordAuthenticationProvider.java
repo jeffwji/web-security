@@ -9,10 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -30,7 +27,7 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-		UsernamePasswordAuthenticationToken token = getAuthenticationToken(authentication);
+		UsernamePasswordAuthenticationToken token = authenticationService.getAuthenticationToken(authentication);
 
 		try {
 			authenticationService.authentication(token);
@@ -54,13 +51,13 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 		/**
 		 * Set user principal for HttpSevletRequest
 		 */
-		SecurityContextHolder.getContext().setAuthentication(authentication);
+		//SecurityContextHolder.getContext().setAuthentication(token);
 
 		return new UsernamePasswordAuthenticationToken(token.getPrincipal(), token.getCredentials(), grantedAuthorities);
 	}
 
 
-	public UsernamePasswordAuthenticationToken getAuthenticationToken(Authentication authentication) {
+	/*public UsernamePasswordAuthenticationToken getAuthenticationToken(Authentication authentication) {
 		Principal principal = new Principal();
 		String realme = null;
 		String username = null;
@@ -89,7 +86,7 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 		}
 
 		return new UsernamePasswordAuthenticationToken(principal, authentication.getCredentials());
-	}
+	}*/
 
 	@Override
 	public boolean supports(Class<?> auth) {

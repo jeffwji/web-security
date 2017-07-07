@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
 import java.util.List;
@@ -14,20 +15,9 @@ public class AuthenticationService implements IAuthenticationService {
 
 	//@Autowired protected UserProperties userPreferences;
 
-	@Autowired(required = false) protected ISecurityService securityService;
-
-	@Override
-	public List<Authority<?, ?>> grantAuthority(UsernamePasswordAuthenticationToken token) {
-		List<Authority<?, ?>> authorityList = null;
-
-		authorityList = securityService.getAuthorities((Principal) token.getPrincipal());
-
-		return authorityList;
-	}
-
-	@SuppressWarnings("serial")
-	@Override
-	public void authentication(UsernamePasswordAuthenticationToken token) throws AuthenticationException {
+	@Autowired protected ISecurityService securityService;
+	/*@Autowired(required = false) protected ISecurityService securityService;
+	protected ISecurityService getSecurityService() {
 		if (null == securityService) {
 			try {
 				securityService = new SimpleSecurityService("users.conf");
@@ -37,7 +27,27 @@ public class AuthenticationService implements IAuthenticationService {
 				throw new AuthenticationException(e.getMessage()) {};
 			}
 		}
+		return securityService;
+	}*/
 
+	@Override
+	public List<Authority<?, ?>> grantAuthority(UsernamePasswordAuthenticationToken token) {
+		List<Authority<?, ?>> authorityList = null;
+
+		authorityList = securityService.getAuthorities(token.getPrincipal());
+
+		return authorityList;
+	}
+
+
+	@SuppressWarnings("serial")
+	@Override
+	public void authentication(UsernamePasswordAuthenticationToken token) throws AuthenticationException {
 		securityService.validate(token);
+	}
+
+	@Override
+	public UsernamePasswordAuthenticationToken getAuthenticationToken(Authentication authentication) {
+		return new UsernamePasswordAuthenticationToken(securityService.getPrincipal(authentication), authentication.getCredentials());
 	}
 }

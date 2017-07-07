@@ -27,6 +27,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringApplicationConfiguration(classes = { SecurityConfigure.class, ApplicationCoreConfigure.class })
 @TestPropertySource(locations = "classpath:config/security.properties")
 public class LoginControllerTest extends ControllerTestBase {
+	@Override
+	public String getPassword(){
+		return "pa55w0rd";
+	}
+
 	//@Autowired
 	//UserProperties userProperties;
 	@Autowired(required = false)

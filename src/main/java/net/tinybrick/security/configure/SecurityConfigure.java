@@ -36,7 +36,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -68,6 +69,11 @@ import java.util.Map;
 //@EnableConfigurationProperties({ PropertySourcesPlaceholderConfigurer.class })
 @PropertySource(value = "classpath:config/security.properties")
 public class SecurityConfigure {
+	final Logger logger = Logger.getLogger(this.getClass());
+
+	@Autowired
+	private ApplicationContext appContext;
+
 	@ConditionalOnMissingBean(SecurityProperties.class)
 	@Bean
 	protected SecurityProperties SecurityProperties() {
@@ -79,7 +85,21 @@ public class SecurityConfigure {
 		return new AuthenticationService();
 	}
 
-	@Value("${authentication.filter.captcha.minAcceptedWordLength:6}") int minAcceptedWordLength;
+	@Autowired(required = false) protected ISecurityService securityService;
+	@Bean
+	protected ISecurityService getSecurityService() {
+		if (null == securityService) {
+			try {
+				securityService = new SimpleSecurityService("users.conf");
+			} catch (Exception e) {
+				throw new AuthenticationException(e.getMessage()) {
+				};
+			}
+		}
+		return securityService;
+	}
+
+		@Value("${authentication.filter.captcha.minAcceptedWordLength:6}") int minAcceptedWordLength;
 	@Value("${authentication.filter.captcha.maxAcceptedWordLength:6}") int maxAcceptedWordLength;
 	@Value("${authentication.filter.captcha.randomWords:ABDEFGHJKLMNPQRTYabdefghijkmnpqrtuy23456789}") String randomWords;
 
@@ -99,6 +119,34 @@ public class SecurityConfigure {
 		return new UsernamePasswordAuthenticationProvider();
 	}
 
+	@Value("${authentication.filter.secure.public_key_file:}") String publicKeyFileName;
+	@Value("${authentication.filter.secure.private_key_file:}") String privateKeyFileName;
+	@Bean
+	public IEncryptionKeyManager encryptionKeyManager() throws IOException, DecoderException {
+		IEncryptionKeyManager encryptionKeyManager;
+
+		if((null != publicKeyFileName && publicKeyFileName.trim().length() > 0)
+				&& (null != privateKeyFileName && privateKeyFileName.trim().length() > 0)) {
+			InputStream publicKeyInput =  appContext.getResource(publicKeyFileName).getInputStream();
+			InputStream privateKeyInput = appContext.getResource(privateKeyFileName).getInputStream();
+
+			encryptionKeyManager = new RsaEncryptionKeyManager(publicKeyInput, privateKeyInput);
+		}
+		else {
+			encryptionKeyManager = new RsaEncryptionKeyManager();
+		}
+		logger.info("No EncryptionKeyManager instance has been found. a default one has been created.");
+
+		return encryptionKeyManager;
+	}
+
+	@Bean
+	public IEncryptionManager encryptionManager() throws Exception {
+		IEncryptionManager encryptionManager = new RsaEncryptionManager(encryptionKeyManager());
+
+		return encryptionManager;
+	}
+
 	@Configuration
 	@Order(SecurityProperties.ACCESS_OVERRIDE_ORDER + 0)
 	public static class EnhancedWebSecurityConfigureAdapter extends WebSecurityConfigurerAdapter {
@@ -108,6 +156,7 @@ public class SecurityConfigure {
 		final Logger logger = Logger.getLogger(this.getClass());
 
 		@Autowired private SecurityProperties security;
+		@Autowired IEncryptionManager encryptionManager;
 		@Autowired AuthenticationProvider authenticationProvider;
 		@Autowired(required = false)
         List<IHttpSecurityConfigure> httpSecurityConfigure;
@@ -140,13 +189,12 @@ public class SecurityConfigure {
 			return captchaAuthenticationFilter;
 		}
 
-		@Value("${authentication.filter.secure.public_key_file:}") String publicKeyFileName;
+		/*@Value("${authentication.filter.secure.public_key_file:}") String publicKeyFileName;
 		@Value("${authentication.filter.secure.private_key_file:}") String privateKeyFileName;
 		@Bean
 		public IEncryptionKeyManager encryptionKeyManager() throws IOException, DecoderException {
 			IEncryptionKeyManager encryptionKeyManager;
 
-			//if (null == encryptionKeyManager) {
                 if((null != publicKeyFileName && publicKeyFileName.trim().length() > 0)
                         && (null != privateKeyFileName && privateKeyFileName.trim().length() > 0)) {
                     InputStream publicKeyInput =  appContext.getResource(publicKeyFileName).getInputStream();
@@ -158,19 +206,16 @@ public class SecurityConfigure {
                     encryptionKeyManager = new RsaEncryptionKeyManager();
                 }
                 logger.info("No EncryptionKeyManager instance has been found. a default one has been created.");
-			//}
 
 			return encryptionKeyManager;
 		}
 
 		@Bean
 		public IEncryptionManager encryptionManager() throws Exception {
-			//if (null == encryptionManager) {
 			IEncryptionManager encryptionManager = new RsaEncryptionManager(encryptionKeyManager());
-			//}
 
 			return encryptionManager;
-		}
+		}*/
 
 		@Value("${authentication.filter.enhanced_basic:true}") boolean enhancedBasic;
 
@@ -178,7 +223,7 @@ public class SecurityConfigure {
 			EnhancedBasicAuthenticationFilter enhancedBasicAuthenticationFilter = new EnhancedBasicAuthenticationFilter(
 					authenticationManagerBean());
 			enhancedBasicAuthenticationFilter.setEnhancedBasic(enhancedBasic);
-			enhancedBasicAuthenticationFilter.setEncryptionManager(encryptionManager());
+			enhancedBasicAuthenticationFilter.setEncryptionManager(encryptionManager);
 			return enhancedBasicAuthenticationFilter;
 		}
 
@@ -321,17 +366,8 @@ public class SecurityConfigure {
 				logger.warn(e.getMessage(), e);
 			}
 
-			String[] usernameParts = username.split("\\\\");
-			Principal principal = null;
-			if (usernameParts.length > 1)
-				principal = new Principal(usernameParts[0], usernameParts[1]);
-			else
-				principal = new Principal(username);
-
-			UsernamePasswordAuthenticationToken token =new UsernamePasswordAuthenticationToken(principal, password);
-            //token.setUsername(username);
-            //token.setPassword(password);
-
+			UsernamePasswordAuthenticationToken token
+					= authenticationService.getAuthenticationToken(new UsernamePasswordAuthenticationToken(username, password));
             authenticationService.authentication(token);
             String encryptedString = null;
             try {
@@ -354,21 +390,11 @@ public class SecurityConfigure {
 
 		@RequestMapping(value = "/rest/v1/user", consumes = { MediaType.ALL_VALUE }, produces = {
 				MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
-		public @ResponseBody ResponseEntity<Map<String, Object>> user(Principal principal) {
+		public @ResponseBody ResponseEntity<Map<String, Object>> user(Authentication authentication) {
 			Map<String, Object> userInfoMap = new HashMap<String, Object>();
-			//userInfoMap.put("username", userProperties.getCredential().getUsername());
-			//userInfoMap.put("authority", userProperties.getAuthorities());
-            userInfoMap.put("principal", principal);
-            userInfoMap.put("authority", SecurityContextHolder.getContext().getAuthentication().getAuthorities());
+            userInfoMap.put("authentication", authentication);
 
 			return new ResponseEntity<Map<String, Object>>(userInfoMap, HttpStatus.OK);
 		}
-
-        /*@RequestMapping({"/user", "/me"})
-        public Map<String, String> user(Principal principal) {
-            Map<String, String> map = new LinkedHashMap<String, String>();
-            map.put("name", null == principal ? "null" : principal.getName());
-            return map;
-        }*/
     }
 }

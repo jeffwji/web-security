@@ -3,12 +3,15 @@ package net.tinybrick.security.authentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.*;
 
-public class SimpleSecurityService implements ISecurityService {
+public class SimpleSecurityService implements ISecurityService<Principal> {
 	Logger logger = LoggerFactory.getLogger(getClass());
 
 	Properties properties = new Properties();
@@ -89,8 +92,8 @@ public class SimpleSecurityService implements ISecurityService {
 	@Override
 	public List<Authority<?, ?>> getAuthorities(Principal principal) {
 		List<Authority<?, ?>> authorities = new ArrayList<Authority<?, ?>>();
-		String username = (null == principal.getRealm() || principal.getRealm().toUpperCase().equals("DEFAULT"))?
-				principal.getUsername():principal.getRealm().toUpperCase()+"\\"+principal.getUsername();
+		String username = (null == ((Principal)principal).getRealm() || ((Principal)principal).getRealm().toUpperCase().equals("DEFAULT"))?
+				((Principal)principal).getUsername():((Principal)principal).getRealm().toUpperCase()+"\\"+((Principal)principal).getUsername();
 
 		Map<String, List<Authority<?, ?>>> authorityMap = authMap.get(username);
 		if(null != authorityMap){
@@ -116,4 +119,33 @@ public class SimpleSecurityService implements ISecurityService {
 		}
 		return auth;
 	}
+
+	public Principal getPrincipal(Authentication authentication) {
+		Principal principal = new Principal();
+		String realme = null;
+		String username = null;
+
+		if (authentication.getClass() == UsernamePasswordAuthenticationToken.class) {
+			try {
+				String authenticationString = authentication.getPrincipal().toString();
+				String[] usernameParts = authenticationString.split("\\\\");
+				if (usernameParts.length > 1) {
+					realme = usernameParts[0];
+					username = URLDecoder.decode(usernameParts[1], "UTF-8");
+					principal.setUsername(username);
+					principal.setRealm(realme);
+				} else {
+					username = URLDecoder.decode(usernameParts[0], "UTF-8");
+					principal.setUsername(username);
+				}
+			} catch (UnsupportedEncodingException e) {
+				logger.warn("UnsupportedEncodingException occurs!");
+				throw new AuthenticationException(e.getMessage(), e) {
+					private static final long serialVersionUID = 6781730518784884442L;
+				};
+			}
+		}
+		return principal;
+	}
+
 }

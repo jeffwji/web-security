@@ -19,6 +19,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 
@@ -41,7 +43,13 @@ public class RealmSecurityControllerIT extends IntegrationTestBase {
 
     @Override
     public String getUsername() {
-        return "REALM\\1234567";
+        String username = "REALM\\1234567";
+        try {
+            return URLEncoder.encode(username,"UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            logger.debug(e.getMessage());
+            return username;
+        }
     }
 
     @Override
@@ -69,6 +77,6 @@ public class RealmSecurityControllerIT extends IntegrationTestBase {
                 LinkedHashMap.class, false);
 
         Assert.assertEquals(HttpStatus.OK, entity.getStatusCode());
-        Assert.assertTrue(entity.getBody().containsKey("authority"));
+        Assert.assertTrue(entity.getBody().containsKey("authentication"));
     }
 }
