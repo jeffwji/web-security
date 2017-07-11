@@ -354,9 +354,14 @@ public class SecurityConfigure {
         IAuthenticationService authenticationService;
 		@Autowired(required = false) IEncryptionManager encryptionManager;
 
-        @RequestMapping(value = "/login/token/{username}/{password}", consumes = { MediaType.ALL_VALUE }, produces = {
-                MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
-        public @ResponseBody ResponseEntity<Map<String, Object>> tokenLogin(@PathVariable String username,@PathVariable String password) {
+        @RequestMapping(
+				method = {RequestMethod.POST},
+				value = "/login/token",
+				consumes = { MediaType.APPLICATION_FORM_URLENCODED_VALUE },
+				produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+        public @ResponseBody ResponseEntity<Map<String, Object>> tokenLogin(
+        		@RequestParam String username,
+				@RequestParam String password) {
             Map<String, Object> userInfoMap = new HashMap<String, Object>();
 			try {
 				username = URLDecoder.decode(username, "UTF-8");

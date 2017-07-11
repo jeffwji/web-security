@@ -16,10 +16,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -70,7 +70,15 @@ public class LoginControllerTest extends ControllerTestBase {
 
 	@Test
 	public void testGetLoginToken() throws Exception {
-		ResultActions resultActions = GET("/login/token/"+getUsername()+"/"+getPassword(), MediaType.APPLICATION_JSON, MediaType.APPLICATION_JSON);
+		Map<String, Object> form = new HashMap<String, Object>();
+		form.put("username", getUsername());
+		form.put("password", getPassword());
+
+		ResultActions resultActions = POST("/login/token",
+				MediaType.APPLICATION_FORM_URLENCODED,
+				MediaType.APPLICATION_JSON,
+				form,
+				POST_DATA_POSITION.HEADER);
 		resultActions.andDo(print()).andExpect(status().isOk());
 
 		JSONObject tokenJson = new JSONObject(resultActions.andReturn().getResponse().getContentAsString());
