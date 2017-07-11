@@ -169,6 +169,7 @@ public class SecurityConfigure {
 		}
 
 		final static String loginUrl = "/login";
+		final static String registerUrl = "/register";
 		final static String logoutUrl = "/logout";
 
 		//private static CaptchaAuthenticationFilter captchaAuthenticationFilter;
@@ -237,6 +238,8 @@ public class SecurityConfigure {
 					.and().logout().deleteCookies("JSESSIONID")
 					.logoutRequestMatcher(new AntPathRequestMatcher(logoutUrl)).logoutSuccessUrl(loginUrl)
                     .and().authorizeRequests().antMatchers(loginUrl+"/**").permitAll()
+					.and().authorizeRequests().antMatchers(registerUrl).permitAll()
+					.and().authorizeRequests().antMatchers(registerUrl + "/**").permitAll()
 					.and().authorizeRequests().antMatchers("/captcha/**").permitAll()/*
                     .and().authorizeRequests().antMatchers("/images*//**").permitAll()
                     .and().authorizeRequests().antMatchers("/css*//**").permitAll()
