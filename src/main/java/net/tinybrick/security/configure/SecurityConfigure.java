@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -52,10 +53,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URLDecoder;
 import java.util.Collection;
 import java.util.HashMap;
@@ -133,7 +131,16 @@ public class SecurityConfigure {
 			encryptionKeyManager = new RsaEncryptionKeyManager(publicKeyInput, privateKeyInput);
 		}
 		else {
-			encryptionKeyManager = new RsaEncryptionKeyManager();
+			try {
+				Resource priKeyResource = appContext.getResource("classpath:id_rsa");
+				Resource pubKeyResource = appContext.getResource("classpath:id_rsa.pub");
+				InputStream privateKeyInput = priKeyResource.getInputStream();
+				InputStream publicKeyInput = pubKeyResource.getInputStream();
+				encryptionKeyManager = new RsaEncryptionKeyManager(publicKeyInput, privateKeyInput);
+			}
+			catch(FileNotFoundException e){
+				encryptionKeyManager = new RsaEncryptionKeyManager();
+			}
 		}
 		logger.info("No EncryptionKeyManager instance has been found. a default one has been created.");
 
