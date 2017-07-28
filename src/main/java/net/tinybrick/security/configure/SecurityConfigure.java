@@ -25,7 +25,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -97,7 +96,7 @@ public class SecurityConfigure {
 		return securityService;
 	}
 
-		@Value("${authentication.filter.captcha.minAcceptedWordLength:6}") int minAcceptedWordLength;
+	@Value("${authentication.filter.captcha.minAcceptedWordLength:6}") int minAcceptedWordLength;
 	@Value("${authentication.filter.captcha.maxAcceptedWordLength:6}") int maxAcceptedWordLength;
 	@Value("${authentication.filter.captcha.randomWords:ABDEFGHJKLMNPQRTYabdefghijkmnpqrtuy23456789}") String randomWords;
 
@@ -121,28 +120,25 @@ public class SecurityConfigure {
 	@Value("${authentication.filter.secure.private_key_file:}") String privateKeyFileName;
 	@Bean
 	public IEncryptionKeyManager encryptionKeyManager() throws IOException, DecoderException {
-		IEncryptionKeyManager encryptionKeyManager;
+		IEncryptionKeyManager encryptionKeyManager = null;
 
-		if((null != publicKeyFileName && publicKeyFileName.trim().length() > 0)
-				&& (null != privateKeyFileName && privateKeyFileName.trim().length() > 0)) {
-			InputStream publicKeyInput =  appContext.getResource(publicKeyFileName).getInputStream();
-			InputStream privateKeyInput = appContext.getResource(privateKeyFileName).getInputStream();
+		try {
+			if((null != publicKeyFileName && publicKeyFileName.trim().length() > 0)
+					&& (null != privateKeyFileName && privateKeyFileName.trim().length() > 0)) {
+				InputStream publicKeyInput =  new FileInputStream(new File(publicKeyFileName));
+				InputStream privateKeyInput = new FileInputStream(new File(privateKeyFileName));
 
-			encryptionKeyManager = new RsaEncryptionKeyManager(publicKeyInput, privateKeyInput);
-		}
-		else {
-			try {
-				Resource priKeyResource = appContext.getResource("classpath:id_rsa");
-				Resource pubKeyResource = appContext.getResource("classpath:id_rsa.pub");
-				InputStream privateKeyInput = priKeyResource.getInputStream();
-				InputStream publicKeyInput = pubKeyResource.getInputStream();
 				encryptionKeyManager = new RsaEncryptionKeyManager(publicKeyInput, privateKeyInput);
 			}
-			catch(FileNotFoundException e){
+			else {
+				logger.warn("No key file defined. a default one has been created.");
 				encryptionKeyManager = new RsaEncryptionKeyManager();
 			}
 		}
-		logger.info("No EncryptionKeyManager instance has been found. a default one has been created.");
+		catch(FileNotFoundException e){
+			logger.error("No EncryptionKeyManager instance has been found. a default one has been created.", e);
+			throw e;
+		}
 
 		return encryptionKeyManager;
 	}
