@@ -1,7 +1,7 @@
 package net.tinybrick.security.unit;
 
 import net.tinybrick.security.authentication.filter.tools.IEncryptionManager;
-import net.tinybrick.security.configure.SecurityConfigure;
+import net.tinybrick.security.configure.SecurityConfiguration;
 import net.tinybrick.test.web.unit.ControllerTestBase;
 import net.tinybrick.utils.crypto.Codec;
 import net.tinybrick.web.configure.ApplicationCoreConfigure;
@@ -22,7 +22,7 @@ import java.util.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringApplicationConfiguration(classes = { SecurityConfigure.class, ApplicationCoreConfigure.class })
+@SpringApplicationConfiguration(classes = { SecurityConfiguration.class, ApplicationCoreConfigure.class })
 @TestPropertySource(locations = "classpath:config/security.properties")
 public class LoginControllerTest extends ControllerTestBase {
 	@Override

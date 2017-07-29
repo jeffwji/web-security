@@ -6,14 +6,10 @@ import com.octo.captcha.service.image.ImageCaptchaService;
 import net.tinybrick.security.authentication.*;
 import net.tinybrick.security.authentication.filter.CaptchaAuthenticationFilter;
 import net.tinybrick.security.authentication.filter.EnhancedBasicAuthenticationFilter;
-import net.tinybrick.security.authentication.filter.tools.IEncryptionKeyManager;
 import net.tinybrick.security.authentication.filter.tools.IEncryptionManager;
-import net.tinybrick.security.authentication.filter.tools.RsaEncryptionKeyManager;
-import net.tinybrick.security.authentication.filter.tools.RsaEncryptionManager;
 import net.tinybrick.security.utils.captcha.ImageCaptchaEngine;
 import net.tinybrick.utils.crypto.Codec;
 import net.tinybrick.web.configure.WebResources;
-import org.apache.commons.codec.DecoderException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +19,7 @@ import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -52,7 +49,9 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Collection;
 import java.util.HashMap;
@@ -64,8 +63,9 @@ import java.util.Map;
 @Configuration
 @EnableAutoConfiguration
 //@EnableConfigurationProperties({ PropertySourcesPlaceholderConfigurer.class })
+@Import(CryptionConfiguration.class)
 @PropertySource(value = "classpath:config/security.properties")
-public class SecurityConfigure {
+public class SecurityConfiguration {
 	final Logger logger = Logger.getLogger(this.getClass());
 
 	@Autowired
@@ -116,7 +116,7 @@ public class SecurityConfigure {
 		return new UsernamePasswordAuthenticationProvider();
 	}
 
-	@Value("${authentication.filter.secure.public_key_file:}") String publicKeyFileName;
+	/*@Value("${authentication.filter.secure.public_key_file:}") String publicKeyFileName;
 	@Value("${authentication.filter.secure.private_key_file:}") String privateKeyFileName;
 	@Bean
 	public IEncryptionKeyManager encryptionKeyManager() throws IOException, DecoderException {
@@ -148,7 +148,7 @@ public class SecurityConfigure {
 		IEncryptionManager encryptionManager = new RsaEncryptionManager(encryptionKeyManager());
 
 		return encryptionManager;
-	}
+	}*/
 
 	@Configuration
 	@Order(SecurityProperties.ACCESS_OVERRIDE_ORDER + 0)
@@ -193,34 +193,6 @@ public class SecurityConfigure {
 			return captchaAuthenticationFilter;
 		}
 
-		/*@Value("${authentication.filter.secure.public_key_file:}") String publicKeyFileName;
-		@Value("${authentication.filter.secure.private_key_file:}") String privateKeyFileName;
-		@Bean
-		public IEncryptionKeyManager encryptionKeyManager() throws IOException, DecoderException {
-			IEncryptionKeyManager encryptionKeyManager;
-
-                if((null != publicKeyFileName && publicKeyFileName.trim().length() > 0)
-                        && (null != privateKeyFileName && privateKeyFileName.trim().length() > 0)) {
-                    InputStream publicKeyInput =  appContext.getResource(publicKeyFileName).getInputStream();
-                    InputStream privateKeyInput = appContext.getResource(privateKeyFileName).getInputStream();
-
-                    encryptionKeyManager = new RsaEncryptionKeyManager(publicKeyInput, privateKeyInput);
-                }
-                else {
-                    encryptionKeyManager = new RsaEncryptionKeyManager();
-                }
-                logger.info("No EncryptionKeyManager instance has been found. a default one has been created.");
-
-			return encryptionKeyManager;
-		}
-
-		@Bean
-		public IEncryptionManager encryptionManager() throws Exception {
-			IEncryptionManager encryptionManager = new RsaEncryptionManager(encryptionKeyManager());
-
-			return encryptionManager;
-		}*/
-
 		@Value("${authentication.filter.enhanced_basic:true}") boolean enhancedBasic;
 
 		protected EnhancedBasicAuthenticationFilter enhancedBasicAuthenticationFilter() throws Exception {
@@ -243,12 +215,7 @@ public class SecurityConfigure {
                     .and().authorizeRequests().antMatchers(loginUrl+"/**").permitAll()
 					.and().authorizeRequests().antMatchers(registerUrl).permitAll()
 					.and().authorizeRequests().antMatchers(registerUrl + "/**").permitAll()
-					.and().authorizeRequests().antMatchers("/captcha/**").permitAll()/*
-                    .and().authorizeRequests().antMatchers("/images*//**").permitAll()
-                    .and().authorizeRequests().antMatchers("/css*//**").permitAll()
-                    .and().authorizeRequests().antMatchers("/js*//**").permitAll()
-                    .and().authorizeRequests().antMatchers("/static*//**").permitAll()
-                    .and().authorizeRequests().antMatchers("/public*//**").permitAll()*/;
+					.and().authorizeRequests().antMatchers("/captcha/**").permitAll();
 
 			if(0 == insecureResources.length) {
 				if (null != webResources ) {
