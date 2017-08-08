@@ -1,13 +1,14 @@
 package net.tinybrick.security.authentication.filter.tools;
 
 import net.tinybrick.utils.crypto.DES3;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Created by ji.wang on 2017-05-11.
  */
 public class Des3EncryptionManager implements IEncryptionManager {
-    Logger logger = Logger.getLogger(this.getClass());
+    Logger logger = LogManager.getLogger(this.getClass());
     IEncryptionKeyManager keyManager = null;
 
     public Des3EncryptionManager(IEncryptionKeyManager keyManager) throws Exception {

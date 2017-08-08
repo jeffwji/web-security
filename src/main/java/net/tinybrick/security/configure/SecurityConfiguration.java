@@ -10,7 +10,8 @@ import net.tinybrick.security.authentication.filter.tools.IEncryptionManager;
 import net.tinybrick.security.utils.captcha.ImageCaptchaEngine;
 import net.tinybrick.utils.crypto.Codec;
 import net.tinybrick.web.configure.WebResources;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -66,7 +67,7 @@ import java.util.Map;
 @Import(CryptionConfiguration.class)
 @PropertySource(value = "classpath:config/security.properties")
 public class SecurityConfiguration {
-	final Logger logger = Logger.getLogger(this.getClass());
+	final Logger logger = LogManager.getLogger(this.getClass());
 
 	@Autowired
 	private ApplicationContext appContext;
@@ -156,7 +157,7 @@ public class SecurityConfiguration {
         @Autowired
         private ApplicationContext appContext;
 
-		final Logger logger = Logger.getLogger(this.getClass());
+		final Logger logger = LogManager.getLogger(this.getClass());
 
 		@Autowired private SecurityProperties security;
 		@Autowired IEncryptionManager encryptionManager;
@@ -319,7 +320,7 @@ public class SecurityConfiguration {
 
 	@RestController
 	public static class SecurityController {
-		final Logger logger = Logger.getLogger(this.getClass());
+		final Logger logger = LogManager.getLogger(this.getClass());
 		@Autowired
         IAuthenticationService authenticationService;
 		@Autowired(required = false) IEncryptionManager encryptionManager;

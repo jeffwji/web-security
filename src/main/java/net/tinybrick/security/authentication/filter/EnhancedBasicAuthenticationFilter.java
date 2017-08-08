@@ -4,7 +4,8 @@ import net.tinybrick.security.authentication.filter.tools.IEncryptionManager;
 import net.tinybrick.utils.crypto.Codec;
 import net.tinybrick.utils.rest.IRestClient;
 import org.apache.http.auth.AuthenticationException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
@@ -16,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class EnhancedBasicAuthenticationFilter extends BasicAuthenticationFilter {
-	Logger logger = Logger.getLogger(this.getClass());
+	Logger logger = LogManager.getLogger(this.getClass());
 
 	static boolean enhancedBasic = true;
 
@@ -54,7 +55,7 @@ public class EnhancedBasicAuthenticationFilter extends BasicAuthenticationFilter
 	}
 
 	private static class FakeHttpServletRequest extends HttpServletRequestWrapper {
-		Logger logger = Logger.getLogger(this.getClass());
+		Logger logger = LogManager.getLogger(this.getClass());
 
 		static final String AUTHORIZATION_TOKEN = "Authorization";
 		static final String AUTHORIZATION_BASIC_TOKEN = IRestClient.AUTHENTICATION_METHOD.Basic.toString();

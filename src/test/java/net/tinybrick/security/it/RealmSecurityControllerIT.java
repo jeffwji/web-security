@@ -4,14 +4,14 @@ import net.tinybrick.security.WebSecurityMainClass;
 import net.tinybrick.security.authentication.filter.tools.IEncryptionManager;
 import net.tinybrick.test.web.it.IntegrationTestBase;
 import net.tinybrick.utils.rest.IRestClient;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.IntegrationTest;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,18 +28,19 @@ import java.util.LinkedHashMap;
  * Created by ji.wang on 2017-07-07.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = WebSecurityMainClass.class)
-@WebAppConfiguration
-@IntegrationTest({ "server.port:0", "authentication.filter.captcha:false",
+@SpringBootTest(classes = WebSecurityMainClass.class,
+        webEnvironment= SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = {
+        "authentication.filter.captcha:false",
         "authentication.filter.captcha.minAcceptedWordLength:1",
-        "authentication.filter.captcha.maxAcceptedWordLength:1", "authentication.filter.captcha.randomWords:0" })
+        "authentication.filter.captcha.maxAcceptedWordLength:1",
+        "authentication.filter.captcha.randomWords:0" })
 @DirtiesContext
 public class RealmSecurityControllerIT extends IntegrationTestBase {
-    Logger logger = Logger.getLogger(this.getClass());
+    Logger logger = LogManager.getLogger(this.getClass());
 
     @Autowired(required = false)
     IEncryptionManager encryptionManager;
-    @Value("${local.server.port}") private int port;
 
     @Override
     public String getUsername() {

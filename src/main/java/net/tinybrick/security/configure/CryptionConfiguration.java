@@ -5,7 +5,8 @@ import net.tinybrick.security.authentication.filter.tools.IEncryptionManager;
 import net.tinybrick.security.authentication.filter.tools.RsaEncryptionKeyManager;
 import net.tinybrick.security.authentication.filter.tools.RsaEncryptionManager;
 import org.apache.commons.codec.DecoderException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -19,7 +20,7 @@ import java.io.*;
 @EnableAutoConfiguration
 @Configuration
 public class CryptionConfiguration {
-    final Logger logger = Logger.getLogger(this.getClass());
+    final Logger logger = LogManager.getLogger(this.getClass());
 
     @Value("${authentication.filter.secure.public_key_file:}") String publicKeyFileName;
     @Value("${authentication.filter.secure.private_key_file:}") String privateKeyFileName;

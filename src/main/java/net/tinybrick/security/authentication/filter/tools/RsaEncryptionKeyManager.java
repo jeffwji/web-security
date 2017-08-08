@@ -3,7 +3,8 @@ package net.tinybrick.security.authentication.filter.tools;
 import net.tinybrick.utils.crypto.Codec;
 import net.tinybrick.utils.crypto.RSA;
 import org.apache.commons.codec.DecoderException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,7 +19,7 @@ import java.security.NoSuchAlgorithmException;
  * Created by ji.wang on 2017-05-11.
  */
 public class RsaEncryptionKeyManager implements IEncryptionKeyManager{
-    Logger logger = Logger.getLogger(this.getClass());
+    Logger logger = LogManager.getLogger(this.getClass());
     static int default_keyLength=1024;
 
     byte[] publicKey = null;

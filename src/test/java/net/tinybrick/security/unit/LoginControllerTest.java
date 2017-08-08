@@ -9,7 +9,7 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -22,7 +22,7 @@ import java.util.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringApplicationConfiguration(classes = { SecurityConfiguration.class, ApplicationCoreConfigure.class })
+@SpringBootTest(classes = { SecurityConfiguration.class, ApplicationCoreConfigure.class })
 @TestPropertySource(locations = "classpath:config/security.properties")
 public class LoginControllerTest extends ControllerTestBase {
 	@Override

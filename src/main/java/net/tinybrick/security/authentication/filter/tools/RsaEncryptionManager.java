@@ -2,13 +2,14 @@ package net.tinybrick.security.authentication.filter.tools;
 
 import net.tinybrick.utils.crypto.Codec;
 import net.tinybrick.utils.crypto.RSA;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Created by ji.wang on 2017-05-11.
  */
 public class RsaEncryptionManager implements IEncryptionManager {
-    Logger logger = Logger.getLogger(this.getClass());
+    Logger logger = LogManager.getLogger(this.getClass());
     IEncryptionKeyManager keyManager = null;
 
     public RsaEncryptionManager(IEncryptionKeyManager keyManager) throws Exception {
